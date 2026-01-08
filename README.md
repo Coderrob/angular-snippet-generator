@@ -1,71 +1,162 @@
-# angular-snippet-generator README
+# Angular Snippet Generator
 
-This is the README for your extension "angular-snippet-generator". After writing up a brief description, we recommend including the following sections.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Coverage](https://img.shields.io/badge/coverage-99%25-brightgreen.svg)
+[![ESLint](https://img.shields.io/badge/ESLint-9.x-4B32C3.svg)](https://eslint.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6.svg)](https://www.typescriptlang.org/)
+[![Code Style: Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io/)
+
+## Overview
+
+Angular Snippet Generator is a Visual Studio Code extension designed to streamline
+Angular development by automatically generating code snippets from component source files.
+It simplifies repetitive tasks, improves productivity, and ensures consistency in your
+Angular projects.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+- **Automatic Snippet Generation**: Parses Angular component files and generates VS Code snippets.
+- **Input/Output Detection**: Extracts `@Input()` and `@Output()` decorated properties.
+- **Type-Aware**: Generates appropriate snippet placeholders based on property types.
+- **Get Accessor Support**: Handles getter-based input properties.
 
-For example if there is an image subfolder under your extension project workspace:
+## Getting Started
 
-\!\[feature X\]\(images/feature-x.png\)
+### Prerequisites
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+- **Node.js**: Ensure you have Node.js installed. [Download Node.js](https://nodejs.org/)
+- **Visual Studio Code**: Install VS Code. [Download VS Code](https://code.visualstudio.com/)
 
-## Requirements
+### Installation
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+1. Clone the repository:
 
-## Extension Settings
+   ```bash
+   git clone https://github.com/Coderrob/angular-snippet-generator.git
+   ```
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+2. Navigate to the project directory:
 
-For example:
+   ```bash
+   cd angular-snippet-generator
+   ```
 
-This extension contributes the following settings:
+3. Install dependencies:
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+   ```bash
+   npm install
+   ```
 
-## Known Issues
+### Usage
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
+1. Open the project in VS Code.
+2. Run the extension in the VS Code debugger.
+3. Use the command palette (`Ctrl+Shift+P` or `Cmd+Shift+P` on macOS) to access the snippet generator commands.
 
-## Release Notes
+## Development
 
-Users appreciate release notes as you update your extension.
+### Available Scripts
 
-### 1.0.0
+| Script | Description |
+| ------ | ----------- |
+| `npm run compile` | Build the extension with webpack |
+| `npm run watch` | Watch mode for development |
+| `npm run lint` | Run ESLint and code duplication checks |
+| `npm run lint:fix` | Auto-fix ESLint issues |
+| `npm run format` | Format code with Prettier |
+| `npm run test:unit` | Run unit tests |
+| `npm run coverage` | Run tests with coverage report |
+| `npm run package` | Create production build |
 
-Initial release of ...
+### Running Tests
 
-### 1.0.1
+```bash
+# Compile and run unit tests
+npm run compile-tests && npm run test:unit
 
-Fixed issue #.
+# Run with coverage
+npm run coverage
+```
 
-### 1.1.0
+## Code Quality
 
-Added features X, Y, and Z.
+This project enforces strict code quality standards:
 
----
+### Linting & Formatting
 
-## Following extension guidelines
+- **ESLint 9.x** with flat config format
+- **Prettier** for consistent code formatting
+- **JSDoc** required for all exported functions
+- **Import sorting** by groups (builtin → external → internal)
 
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
+### Testing
 
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
+- **Mocha** test framework with TDD style
+- **Truth table patterns** for comprehensive test coverage
+- **95%+ code coverage** threshold enforced
 
-## Working with Markdown
+### Code Duplication
 
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
+- **jscpd** checks for code duplication
+- **2% maximum** duplication threshold
 
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
+## Project Structure
 
-## For more information
+```text
+src/
+├── extension.ts    # VS Code extension entry point
+├── files.ts        # File system utilities
+├── nodes.ts        # TypeScript AST node utilities
+├── parser.ts       # Angular component parser
+├── snippet.ts      # Snippet generation logic
+├── strings.ts      # String manipulation utilities
+├── types.ts        # Type definitions and enums
+└── test/
+    └── suite/      # Unit tests
+```
 
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
+## Best Practices
 
-**Enjoy!**
+### Architecture
+
+- **Composition over inheritance**: Functions compose smaller utilities.
+- **Dependency injection**: File system operations use injectable providers.
+- **Pure functions**: Side-effect-free logic for testability.
+- **Single responsibility**: Each module has a focused purpose.
+
+### Code Standards
+
+- All exported functions require JSDoc with `@param` and `@returns`.
+- Use `const` arrow functions for consistency.
+- Prefer early returns over nested conditionals.
+- Use TypeScript strict mode.
+
+### Testing Standards
+
+- Test descriptions follow "should ... do X" pattern.
+- Use truth tables for parameterized testing.
+- Cover positive cases, negative cases, and edge cases.
+- Mock external dependencies (file system, VS Code API).
+
+## Support
+
+If you encounter any issues or have questions, please open an issue on the
+[GitHub repository](https://github.com/Coderrob/angular-snippet-generator/issues).
+
+## Contributing
+
+1. Fork the repository.
+2. Create a feature branch (`git checkout -b feature/amazing-feature`).
+3. Ensure tests pass (`npm run coverage`).
+4. Ensure linting passes (`npm run lint`).
+5. Commit changes (`git commit -m 'Add amazing feature'`).
+6. Push to branch (`git push origin feature/amazing-feature`).
+7. Open a Pull Request.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Ownership
+
+This repository is maintained by **Rob "Coderrob" Lindley**. For inquiries, please contact via GitHub.

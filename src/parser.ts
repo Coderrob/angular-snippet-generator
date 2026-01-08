@@ -1,6 +1,6 @@
 /**
  * MIT License
- * Copyright (c) 2023 Rob "Coderrob" Lindley
+ * Copyright (c) 2026 Rob "Coderrob" Lindley
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,178 +21,157 @@
  * SOFTWARE.
  */
 
-import * as ts from 'typescript';
-import * as nodes from './nodes';
+import * as ts from "typescript";
+
+import * as nodes from "./nodes";
 import {
   ComponentInfo,
   DecoratorType,
   Property,
   SELECTOR_PROPERTY,
-} from './types';
-
-const { log } = console;
+} from "./types";
 
 /**
- * Gets the root node of an abstract syntax tree from the TypeScript's
- * file contents.
- *
- * @param {string|undefined} sourceText = string contents of an a TypeScript file
- * @returns {ts.SourceFile|undefined} the root node of the TypeScript file's AST; otherwise returns undefined.
+ * Creates a TypeScript source file from source text.
+ * @param sourceText - The TypeScript source code string.
+ * @returns The parsed source file or undefined if empty.
  */
-function getTypeScriptSource(sourceText = ''): ts.SourceFile | undefined {
-  if (!sourceText) {
-    return;
-  }
-  return ts.createSourceFile(
-    'temp.ts', // Temporary file name
-    sourceText,
-    ts.ScriptTarget.Latest,
-    true, // start source code node at root node
-    ts.ScriptKind.TS // the type of file content being read
-  );
-}
+const createSourceFile = (sourceText = ""): ts.SourceFile | undefined =>
+  sourceText
+    ? ts.createSourceFile(
+        "temp.ts",
+        sourceText,
+        ts.ScriptTarget.Latest,
+        true,
+        ts.ScriptKind.TS
+      )
+    : undefined;
 
 /**
- * Walk through the component decorator's properties looking
- * for the selector property and its value. When found the selector
- * value will be sent back to the caller.
- *
- * @param node
- * @returns The component selector property value; otherwise returns an empty string.
+ * Extracts the selector property value from a component decorator.
+ * @param decorator - The component decorator node.
+ * @returns The selector string or empty string if not found.
  */
-function getSelectorName(node: ts.Node): string {
-  if (!ts.isClassDeclaration(node) || !ts.canHaveDecorators(node)) {
-    return '';
-  }
-  const decorator = ts.getDecorators(node)?.find(nodes.isComponent);
-  if (!decorator) {
-    return '';
-  }
-  /**
-   * Iterate through the component decorator's properties looking
-   * for the selector property, and then return its value when
-   * found; otherwise returns an empty string.
-   */
+const extractSelectorFromDecorator = (decorator: ts.Decorator): string => {
   if (!ts.isCallOrNewExpression(decorator.expression)) {
-    return '';
+    return "";
   }
-  for (const argument of decorator.expression?.arguments ?? []) {
-    if (!ts.isObjectLiteralExpression(argument)) {
+
+  for (const arg of decorator.expression.arguments ?? []) {
+    if (!ts.isObjectLiteralExpression(arg)) {
       continue;
     }
-    const property = nodes.findAssignedProperty(argument, SELECTOR_PROPERTY);
-    if (!property) {
-      continue;
-    }
+
+    const prop = nodes.findAssignedProperty(arg, SELECTOR_PROPERTY);
     if (
-      !ts.isPropertyAssignment(property) ||
-      !ts.isStringLiteralLike(property.initializer)
+      prop &&
+      ts.isPropertyAssignment(prop) &&
+      ts.isStringLiteralLike(prop.initializer)
     ) {
-      continue;
+      return prop.initializer.text;
     }
-
-    const selectorName = property.initializer?.text ?? '';
-    if (!selectorName) {
-      continue;
-    }
-    return selectorName;
   }
-  return '';
-}
+  return "";
+};
 
 /**
- * @param node
- * @param type
- * @param sourceCode
+ * Gets the component selector from a class declaration.
+ * @param node - The class declaration node.
+ * @returns The selector value or empty string.
  */
-function getDecoratorProperties(
-  node: ts.Node,
-  type: DecoratorType,
-  sourceCode: ts.SourceFile
-): Property[] {
-  const names: Property[] = [];
-  if (!ts.isClassDeclaration(node)) {
-    return names;
+const getSelectorName = (node: ts.ClassDeclaration): string => {
+  if (!ts.canHaveDecorators(node)) {
+    return "";
   }
-  node.members?.filter(nodes.isPropertyOrGetAccessor).forEach((member) =>
-    ts
-      .getDecorators(member)
-      ?.filter((decorator: ts.Node) => nodes.isDecorator(decorator, type))
-      .forEach((decorator: ts.Decorator) => {
-        /**
-         * Use the alias over property identifier to cover case
-         * when an alias is set in @Input('alias') or @Output('alias').
-         */
-        const name = ts.isIdentifier(member.name) ? member.name?.text : '';
-        names.push({
-          name: nodes.getAliasName(decorator.expression) || name,
-          type: nodes.getTypeName(member, sourceCode),
-        });
-      })
-  );
-  return names;
-}
+
+  const decorator = ts.getDecorators(node)?.find(nodes.isComponent);
+  return decorator ? extractSelectorFromDecorator(decorator) : "";
+};
 
 /**
- * Gets the first component's metadata information
- * found within a source code file.
- *
- * The assumption here is that a component's TypeScript
- * file should contain only one component
- *
- * @param sourceCode
- * @returns an array of component info objects for components found in the source code; otherwise an empty array.
+ * Extracts properties with a specific decorator type from a class.
+ * @param classNode - The class declaration node.
+ * @param decoratorType - The decorator type to filter by.
+ * @param sourceCode - The source file for type extraction.
+ * @returns Array of extracted properties.
  */
-function getComponentInfo(
+const extractDecoratorProperties = (
+  classNode: ts.ClassDeclaration,
+  decoratorType: DecoratorType,
   sourceCode: ts.SourceFile
-): ComponentInfo | undefined {
-  const components: ComponentInfo[] = [];
-  function visit(node: ts.Node): void {
-    if (!node) {
-      return;
-    }
-    /**
-     * Walk the abstract syntax tree until the first class
-     * identifier is found.
-     *
-     * This makes assumptions that the component class should
-     * be only class contained within the TypeScript file. There
-     * may be constants, enums, types, or interfaces at the same
-     * level but only one class.
-     */
-    if (!ts.isClassDeclaration(node)) {
-      ts.forEachChild(node, visit);
-      return;
-    }
-    const component: ComponentInfo = {
-      className: nodes.getClassName(node),
-      selector: getSelectorName(node),
-      inputs: getDecoratorProperties(node, DecoratorType.INPUT, sourceCode),
-      outputs: getDecoratorProperties(node, DecoratorType.OUTPUT, sourceCode),
-    };
+): Property[] =>
+  classNode.members.filter(nodes.isPropertyOrGetAccessor).flatMap((member) => {
+    const decorators = ts.getDecorators(member) ?? [];
+    return decorators
+      .filter((d): d is ts.Decorator => nodes.isDecorator(d, decoratorType))
+      .map((decorator) => ({
+        name:
+          nodes.getAliasName(decorator.expression) ||
+          (ts.isIdentifier(member.name) ? member.name.text : ""),
+        type: nodes.getTypeName(member, sourceCode),
+      }));
+  });
 
-    // todo - add component validation
-    components.push(component);
-  }
+/**
+ * Builds component info from a class declaration.
+ * @param classNode - The class declaration node.
+ * @param sourceCode - The source file for type extraction.
+ * @returns The component info object.
+ */
+const buildComponentInfo = (
+  classNode: ts.ClassDeclaration,
+  sourceCode: ts.SourceFile
+): ComponentInfo => ({
+  className: nodes.getClassName(classNode),
+  selector: getSelectorName(classNode),
+  inputs: extractDecoratorProperties(
+    classNode,
+    DecoratorType.INPUT,
+    sourceCode
+  ),
+  outputs: extractDecoratorProperties(
+    classNode,
+    DecoratorType.OUTPUT,
+    sourceCode
+  ),
+});
+
+/**
+ * Finds the first class declaration in a source file.
+ * @param sourceCode - The source file to search.
+ * @returns The first class declaration or undefined.
+ */
+const findFirstClass = (
+  sourceCode: ts.SourceFile
+): ts.ClassDeclaration | undefined => {
+  let result: ts.ClassDeclaration | undefined;
+
+  const visit = (node: ts.Node): void => {
+    if (result) {
+      return;
+    }
+    if (ts.isClassDeclaration(node)) {
+      result = node;
+      return;
+    }
+    ts.forEachChild(node, visit);
+  };
+
   visit(sourceCode);
-  /**
-   * Support here for multiple components within a source file
-   * but keeping to expectations of one component per TypeScript
-   * file.
-   */
-  return components[0];
-}
+  return result;
+};
 
 /**
- * @param fileData The string data to parse for input and output properties.
- * @returns the component information that includes its class
- * name, selector attribute, and both input and output properties collections;
- * otherwise returns undefined if no component information was found.
+ * Parses TypeScript source code to extract Angular component information.
+ * @param fileData - The TypeScript source code string.
+ * @returns The component information or undefined if no component found.
  */
-export function parseComponent(fileData = ''): ComponentInfo | undefined {
-  const sourceCode: ts.SourceFile | undefined = getTypeScriptSource(fileData);
+export const parseComponent = (fileData = ""): ComponentInfo | undefined => {
+  const sourceCode = createSourceFile(fileData);
   if (!sourceCode) {
-    return;
+    return undefined;
   }
-  return getComponentInfo(sourceCode);
-}
+
+  const classNode = findFirstClass(sourceCode);
+  return classNode ? buildComponentInfo(classNode, sourceCode) : undefined;
+};

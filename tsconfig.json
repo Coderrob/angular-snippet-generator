@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "esModuleInterop": true,
-    "lib": ["ES2020"],
+    "lib": ["ES2022"],
     "module": "commonjs",
     "noImplicitReturns": true,
     "noUnusedParameters": true,
@@ -9,8 +9,9 @@
     "rootDir": "src",
     "sourceMap": true,
     "strict": true,
-    "target": "ES2020"
+    "target": "ES2022",
+    "skipLibCheck": true
   },
   "exclude": ["node_modules", ".vscode-test"],
-  "include": ["docker/*.ts", "src/test/**/*.ts"]
+  "include": ["src/**/*.ts"]
 }

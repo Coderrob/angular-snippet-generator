@@ -1,6 +1,6 @@
 /**
  * MIT License
- * Copyright (c) 2023 Rob "Coderrob" Lindley
+ * Copyright (c) 2026 Rob "Coderrob" Lindley
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,90 +21,114 @@
  * SOFTWARE.
  */
 
-import fs from 'fs';
-import path from 'path';
+import fs from "node:fs";
+import path from "node:path";
 
-export const SUPPORTED_EXTENSIONS: string[] = ['.ts'];
+/** Supported file extensions for processing. */
+export const SUPPORTED_EXTENSIONS = [".ts"] as const;
+
 /**
  * Per Angular naming convention a component should
  * have a file named with a .component.ts suffix.
- *
- * https://angular.io/guide/styleguide#file-structure-conventions
+ * @see https://angular.io/guide/styleguide#file-structure-conventions
  */
-export const COMPONENT_SUFFIX: string = '.component.ts';
+export const COMPONENT_SUFFIX = ".component.ts";
 
 /**
- * @param {string} [path=""] - The path to a file to read and return the
- * file data from.
- * @returns {(string)} The contents of the file found at the path provided;
- * otherwise will return empty string in the event of failure.
+ * File system abstraction interface for dependency injection.
+ * Enables testing and alternative implementations.
  */
-export function getFileContents(filePath: string = ''): string {
-  try {
-    return fs.readFileSync(filePath, { encoding: 'utf8', flag: 'r' }) ?? '';
-  } catch (error) {
-    console.error(`Failed to read file path provided; ${error}`);
-    return '';
-  }
+export interface FileSystemProvider {
+  /**
+   * Reads the contents of a file.
+   * @param filePath - The path to read.
+   * @returns The file contents or empty string on failure.
+   */
+  readFile(filePath: string): string;
+
+  /**
+   * Lists directory entries.
+   * @param dirPath - The directory to list.
+   * @returns Array of directory entries.
+   */
+  readDir(dirPath: string): fs.Dirent[];
 }
 
-/**
- * Returns a list of supported files found within the directory
- * path and within any of its sub-directories.
- * file extensions.
- * @param dir - The directory path to traverse looking
- * for any files matching the supported file extensions.
- * @returns {string[]} List of files found within the directory
- * structure that matched the list of supported file extensions.
- */
-export function getSupportedFiles(dirPath: string = ''): string[] {
-  if (!dirPath) {
-    throw new Error('Directory path not provided.');
-  }
-  const files: string[] = [];
-  fs.readdirSync(dirPath, { withFileTypes: true }).forEach((dirent) => {
-    const filePath = path.join(dirPath, dirent.name);
-    switch (true) {
-      // Directory - iterate files within the directory its subdirectories
-      case dirent.isDirectory():
-        files.push(...getSupportedFiles(filePath));
-        break;
-
-      // File - process file if supported
-      case dirent.isFile() && isSupportedFile(filePath):
-        files.push(filePath);
-        break;
+/** Default file system implementation using Node.js fs module. */
+export const defaultFileSystem: FileSystemProvider = {
+  readFile: (filePath: string): string => {
+    try {
+      return fs.readFileSync(filePath, { encoding: "utf8", flag: "r" }) ?? "";
+    } catch {
+      return "";
     }
-  });
-  return files;
-}
+  },
+  readDir: (dirPath: string): fs.Dirent[] =>
+    fs.readdirSync(dirPath, { withFileTypes: true }),
+};
 
 /**
- *
- * @param filePath
- * @returns
+ * Checks if a file path has a supported extension.
+ * @param filePath - The file path to check.
+ * @returns True if the file has a supported extension.
  */
-export function isSupportedFile(filePath = ''): boolean {
-  return hasSupportedExtension(filePath) && isComponentFile(filePath);
-}
-
-/**
- *
- * @param filePath
- * @returns
- */
-export function isComponentFile(filePath = ''): boolean {
-  return !!filePath?.toLowerCase().endsWith(COMPONENT_SUFFIX);
-}
-
-/**
- *
- * @param filePath
- * @returns
- */
-export function hasSupportedExtension(filePath = ''): boolean {
-  return (
-    !!filePath &&
-    SUPPORTED_EXTENSIONS.includes(path.extname(filePath)?.toLowerCase())
+export const hasSupportedExtension = (filePath = ""): boolean =>
+  !!filePath &&
+  SUPPORTED_EXTENSIONS.includes(
+    path
+      .extname(filePath)
+      .toLowerCase() as (typeof SUPPORTED_EXTENSIONS)[number]
   );
-}
+
+/**
+ * Checks if a file path follows Angular component naming convention.
+ * @param filePath - The file path to check.
+ * @returns True if the file ends with .component.ts.
+ */
+export const isComponentFile = (filePath = ""): boolean =>
+  filePath.toLowerCase().endsWith(COMPONENT_SUFFIX);
+
+/**
+ * Determines if a file is a supported Angular component file.
+ * @param filePath - The file path to validate.
+ * @returns True if the file is a supported component file.
+ */
+export const isSupportedFile = (filePath = ""): boolean =>
+  hasSupportedExtension(filePath) && isComponentFile(filePath);
+
+/**
+ * Reads file contents from the specified path.
+ * @param filePath - The path to the file to read.
+ * @param fileSystem - Optional file system provider for dependency injection.
+ * @returns The file contents or empty string on failure.
+ */
+export const getFileContents = (
+  filePath = "",
+  fileSystem: FileSystemProvider = defaultFileSystem
+): string => (filePath ? fileSystem.readFile(filePath) : "");
+
+/**
+ * Recursively collects supported component files from a directory.
+ * @param dirPath - The directory path to traverse.
+ * @param fileSystem - Optional file system provider for dependency injection.
+ * @returns Array of file paths matching supported component criteria.
+ * @throws Error if directory path is not provided.
+ */
+export const getSupportedFiles = (
+  dirPath = "",
+  fileSystem: FileSystemProvider = defaultFileSystem
+): string[] => {
+  if (!dirPath) {
+    throw new Error("Directory path not provided.");
+  }
+
+  return fileSystem.readDir(dirPath).flatMap((dirent): string[] => {
+    const filePath = path.join(dirPath, dirent.name);
+
+    if (dirent.isDirectory()) {
+      return getSupportedFiles(filePath, fileSystem);
+    }
+
+    return dirent.isFile() && isSupportedFile(filePath) ? [filePath] : [];
+  });
+};

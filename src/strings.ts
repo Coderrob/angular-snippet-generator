@@ -1,6 +1,6 @@
 /**
  * MIT License
- * Copyright (c) 2023 Rob "Coderrob" Lindley
+ * Copyright (c) 2026 Rob "Coderrob" Lindley
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,35 +22,24 @@
  */
 
 /**
- * Upper case the first character of the string.
- *
- * Note: This function will not scan for the first
- * non-whitespace character to uppercase.
- * @param value
- * @returns
+ * Capitalizes the first character of a string while preserving the rest.
+ * Does not scan for the first non-whitespace character.
+ * @param value - The string to transform.
+ * @returns The string with its first character capitalized, or the original value if empty/falsy.
  */
-export function upperCaseFirstCharacter(value = ''): string {
-  if (!value) {
-    return value;
-  }
-  const firstCharacter = value.charAt(0).toUpperCase();
-  return [firstCharacter, value.slice(1)].filter(Boolean).join('');
-}
+export const upperCaseFirstCharacter = (value = ""): string =>
+  value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
 
 /**
- * Converts a kebab cased string to title cased words.
- *
- * Note: This will convert any word within the string into
- * a title cased word.
- * @param value - The kebab cased string to convert to a snippet title.
- * @returns The formatted title of a kebab cased string with
- * '-' replaced with ' ' and the first character of each word capitalized.
+ * Converts a kebab-cased string to title case.
+ * Replaces hyphens with spaces and capitalizes the first letter of each word.
+ * @param value - The kebab-cased string to convert.
+ * @returns The title-cased string with hyphens replaced by spaces.
  */
-export function kebabToTitleCase(value: string = ''): string {
-  return value
+export const kebabToTitleCase = (value = ""): string =>
+  value
     .trim()
-    .replace('-', ' ')
-    .split(' ')
+    .split("-")
+    .filter(Boolean)
     .map(upperCaseFirstCharacter)
-    .join(' ');
-}
+    .join(" ");

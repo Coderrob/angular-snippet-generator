@@ -1,6 +1,6 @@
 /**
  * MIT License
- * Copyright (c) 2023 Rob "Coderrob" Lindley
+ * Copyright (c) 2026 Rob "Coderrob" Lindley
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,119 +21,124 @@
  * SOFTWARE.
  */
 
-import * as strings from './strings';
-import { ComponentInfo, DataType, Property, Snippet } from './types';
+import { kebabToTitleCase, upperCaseFirstCharacter } from "./strings";
+import { ComponentInfo, DataType, Property, Snippet } from "./types";
 
-const INDENT = '  ';
-const FUNCTION_PREFIX = 'on';
+/** Indentation for snippet body attributes. */
+const INDENT = "  ";
 
-/**
- * @param {string|undefined} value -
- * @returns {string}
- */
-function formatToFunctionName(value: string | undefined = ''): string {
-  if (!value) {
-    return value;
-  }
-  return `${FUNCTION_PREFIX}${strings.upperCaseFirstCharacter(value)}`;
-}
+/** Prefix for generated event handler function names. */
+const FUNCTION_PREFIX = "on";
 
 /**
- * @param {string} name
- * @returns {string}
+ * Converts an event name to a handler function name (e.g., "click" -> "onClick").
+ * @param value - The event name to convert.
+ * @returns The formatted function name with "on" prefix.
  */
-function formatComponentName(name: string = ''): string {
-  return (
-    name
-      .match(/[A-Z][a-z]+/g)
-      ?.map(strings.upperCaseFirstCharacter)
-      .filter(Boolean)
-      .join(' ') ?? ''
-  );
-}
+export const formatToFunctionName = (value = ""): string =>
+  value ? `${FUNCTION_PREFIX}${upperCaseFirstCharacter(value)}` : value;
 
 /**
- *
- * @param property
- * @param index
- * @returns
+ * Extracts a readable component name from a class name.
+ * Splits PascalCase into separate words (e.g., "SaveCancelButtonComponent" -> "Save Cancel Button Component").
+ * @param name - The class name to format.
+ * @returns The formatted display name.
  */
-function propertyToAttribute(property: Property, index: number): string {
+export const formatComponentName = (name = ""): string =>
+  name.match(/[A-Z][a-z]+/g)?.join(" ") ?? "";
+
+/**
+ * Returns type-specific completion values for boolean types.
+ * @param type - The property type.
+ * @returns The completion choices string or empty string.
+ */
+export const getTypeValues = (type: string | DataType | undefined): string =>
+  type === DataType.BOOLEAN ? "|true,false|" : "";
+
+/**
+ * Converts an input property to an HTML attribute string for snippets.
+ * @param property - The property to convert.
+ * @param index - The tab stop index.
+ * @returns The formatted attribute string.
+ */
+export const propertyToAttribute = (
+  property: Property,
+  index: number
+): string => {
   const { name, type } = property;
-  const nameAssignment = `${INDENT}[${name}]=`;
   const typeValues = getTypeValues(type);
-  return !typeValues
-    ? nameAssignment + `\"$${index}\"`
-    : nameAssignment + ['"${', index, typeValues, '}"'].join('');
-}
+  const value = typeValues ? `"\${${index}${typeValues}}"` : `"$${index}"`;
+  return `${INDENT}[${name}]=${value}`;
+};
 
 /**
- *
- * @param property
- * @param index
- * @returns
+ * Converts an output property to an event binding string for snippets.
+ * @param property - The property to convert.
+ * @param index - The tab stop index.
+ * @returns The formatted event binding string.
  */
-export function propertyToFunction(property: Property, index: number): string {
+export const propertyToFunction = (
+  property: Property,
+  index: number
+): string => {
   const { name } = property;
-  const funcName = formatToFunctionName(name);
-  return `${INDENT}(${name})=\"$${index}:${funcName}($event)\"`;
-}
+  return `${INDENT}(${name})="$${index}:${formatToFunctionName(name)}($event)"`;
+};
 
 /**
- *
- * @param type
- * @returns
+ * Maps properties to formatted strings using the provided formatter.
+ * @param properties - The properties to format.
+ * @param formatter - The formatting function.
+ * @param startIndex - The starting tab stop index.
+ * @returns Object with formatted strings and updated index.
  */
-export function getTypeValues(type: string | DataType | undefined): string {
-  switch (type) {
-    case DataType.BOOLEAN:
-      return '|true,false|';
-    case DataType.NUMBER:
-    case DataType.OBJECT:
-    case DataType.STRING:
-    default:
-      return '';
-  }
-}
+const mapProperties = (
+  properties: readonly Property[],
+  formatter: (prop: Property, index: number) => string,
+  startIndex: number
+): { lines: string[]; nextIndex: number } => {
+  const validProps = properties.filter((p) => p?.name);
+  const lines = validProps.map((prop, i) =>
+    formatter(prop, startIndex + i + 1)
+  );
+  return { lines, nextIndex: startIndex + validProps.length };
+};
 
 /**
- *
- * @param component
- * @returns
+ * Creates a VS Code snippet from Angular component information.
+ * @param component - The component info to create a snippet from.
+ * @returns The snippet object or undefined if component is invalid.
  */
-export function createSnippet(component: ComponentInfo): Snippet | undefined {
+export const createSnippet = (
+  component: ComponentInfo
+): Snippet | undefined => {
   const { className, selector, inputs, outputs } = component;
-  const title = strings.kebabToTitleCase(selector);
+
+  if (!selector) {
+    return undefined;
+  }
+
+  const title = kebabToTitleCase(selector);
   let tabIndex = 0;
 
-  /**
-   * @param {}
-   * @returns {(string)[]} returns a string of formatted properties
-   * converted to html markup using the provided parser delegate.
-   */
-  const createSafeMarkup = (
-    properties: Property[],
-    parser: Function
-  ): string[] => {
-    if (!properties || !parser) {
-      return [];
-    }
-    return properties
-      .filter((property) => property?.name)
-      .map((property) => parser(property, ++tabIndex));
-  };
+  const inputResult = mapProperties(inputs, propertyToAttribute, tabIndex);
+  tabIndex = inputResult.nextIndex;
+
+  const outputResult = mapProperties(outputs, propertyToFunction, tabIndex);
+  tabIndex = outputResult.nextIndex;
+
   return {
     [title]: {
       body: [
         `<${selector} `,
-        ...createSafeMarkup(inputs, propertyToAttribute),
-        ...createSafeMarkup(outputs, propertyToFunction),
+        ...inputResult.lines,
+        ...outputResult.lines,
         `></${selector}>`,
-        `$${++tabIndex}`,
-      ].filter(Boolean),
+        `$${tabIndex + 1}`,
+      ],
       description: `A code snippet for ${formatComponentName(className)}.`,
       prefix: [selector],
-      scope: 'html',
+      scope: "html",
     },
   };
-}
+};

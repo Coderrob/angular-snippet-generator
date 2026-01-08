@@ -1,6 +1,6 @@
 /**
  * MIT License
- * Copyright (c) 2023 Rob "Coderrob" Lindley
+ * Copyright (c) 2026 Rob "Coderrob" Lindley
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,193 +21,169 @@
  * SOFTWARE.
  */
 
-import ts from 'typescript';
-import {
-  DataType,
-  DecoratorType,
-  DEFAULT_DATA_TYPE,
-  EVENT_EMITTER_TYPE,
-} from './types';
+import ts from "typescript";
+
+import { DecoratorType, DEFAULT_DATA_TYPE, EVENT_EMITTER_TYPE } from "./types";
 
 /**
- * @param node
+ * Type guard to check if a node is a property declaration or get accessor.
+ * @param node - The TypeScript AST node to check.
+ * @returns True if the node is a property declaration or get accessor.
  */
-export function isPropertyOrGetAccessor(
+export const isPropertyOrGetAccessor = (
   node: ts.Node
-): node is ts.PropertyDeclaration | ts.GetAccessorDeclaration {
-  return !!node && (ts.isPropertyDeclaration(node) || ts.isGetAccessor(node));
-}
+): node is ts.PropertyDeclaration | ts.GetAccessorDeclaration =>
+  !!node && (ts.isPropertyDeclaration(node) || ts.isGetAccessor(node));
 
 /**
- *
- * @param node
- * @param propertyName
- * @returns
+ * Finds a property assignment by name within an object literal expression.
+ * @param node - The object literal expression node.
+ * @param propertyName - The property name to find.
+ * @returns The found property node or undefined.
  */
-export function findAssignedProperty(
+export const findAssignedProperty = (
   node: ts.Node,
   propertyName: string
-): ts.Node | undefined {
+): ts.Node | undefined => {
   if (!ts.isObjectLiteralExpression(node)) {
-    return;
+    return undefined;
   }
-  return node?.properties?.find(
-    (property: ts.ObjectLiteralElementLike) =>
-      !!property &&
-      ts.isPropertyAssignment(property) &&
-      (ts.isIdentifier(property.name) ||
-        ts.isPrivateIdentifier(property.name)) &&
-      property.name?.text === propertyName
+  return node.properties.find(
+    (prop): prop is ts.PropertyAssignment =>
+      ts.isPropertyAssignment(prop) &&
+      (ts.isIdentifier(prop.name) || ts.isPrivateIdentifier(prop.name)) &&
+      prop.name.text === propertyName
   );
-}
+};
 
 /**
- * @param {ts.Node} node - The node to check for a match by name.
- * @param {string} name - The name of the identifier
+ * Checks if a node is an identifier matching a specific name.
+ * @param node - The AST node to check.
+ * @param name - The identifier name to match.
+ * @returns True if the node is an identifier with the specified name.
  */
-export function isIdentifier(
+export const isIdentifier = (
   node: ts.Node,
   name: string
-): node is ts.Identifier | ts.PrivateIdentifier {
-  return !!node && ts.isIdentifier(node) && ts.idText(node) === name;
-}
+): node is ts.Identifier =>
+  !!node && ts.isIdentifier(node) && ts.idText(node) === name;
 
 /**
- * @param {ts.Node} node
- * @param {DecoratorType} type
+ * Checks if a node is a decorator of a specific type.
+ * @param node - The AST node to check.
+ * @param type - The decorator type to match.
+ * @returns True if the node is a decorator of the specified type.
  */
-export function isDecorator(
+export const isDecorator = (
   node: ts.Node,
   type: DecoratorType
-): node is ts.Decorator {
-  if (!ts.isDecorator(node) || !ts.isCallExpression(node.expression)) {
-    return false;
-  }
-  return isIdentifier(node.expression?.expression, type);
-}
+): node is ts.Decorator =>
+  ts.isDecorator(node) &&
+  ts.isCallExpression(node.expression) &&
+  isIdentifier(node.expression.expression, type);
 
 /**
- * @param {ts.Node} node
+ * Checks if a decorator is an Angular @Component decorator.
+ * @param node - The decorator node to check.
+ * @returns True if the decorator is a Component decorator.
  */
-export function isComponent(node: ts.Decorator): boolean {
-  if (!node || !ts.isCallExpression(node.expression)) {
-    return false;
-  }
-  return isIdentifier(node.expression?.expression, DecoratorType.COMPONENT);
-}
+export const isComponent = (node: ts.Decorator): boolean =>
+  !!node &&
+  ts.isCallExpression(node.expression) &&
+  isIdentifier(node.expression.expression, DecoratorType.COMPONENT);
 
 /**
- *
- * @param node
- * @param sourceCode
- * @returns
+ * Extracts the alias name from a decorator call expression.
+ * @param node - The call expression node.
+ * @returns The alias string or empty string if not found.
  */
-export function getTypeName(node: ts.Node, sourceCode: ts.SourceFile): string {
-  if (!ts.isPropertySignature(node)) {
-    return '';
-  }
-  const name = node.type
-    ? getReferenceTypeName(node, sourceCode)
-    : getLiteralTypeName(node, sourceCode);
-  return isMarkedUndefined(node) ? `${name}|undefined` : name;
-}
-
-/**
- * @param property
- */
-export function isMarkedUndefined(
-  property: ts.PropertySignature | undefined
-): boolean {
-  return !!property?.questionToken;
-}
-
-/**
- *
- */
-export function getAliasName(node: ts.Node): string {
+export const getAliasName = (node: ts.Node): string => {
   if (!ts.isCallExpression(node)) {
-    return '';
+    return "";
   }
-  const [aliasNode] = node?.arguments ?? [];
-  if (!aliasNode || !ts.isStringLiteral(aliasNode)) {
-    return '';
-  }
-  return aliasNode.text;
-}
+  const [aliasNode] = node.arguments ?? [];
+  return aliasNode && ts.isStringLiteral(aliasNode) ? aliasNode.text : "";
+};
 
 /**
- * @param {ts.ClassDeclaration|undefined} node
+ * Extracts the class name from a class declaration node.
+ * @param node - The AST node to extract the class name from.
+ * @returns The class name or empty string if not a class declaration.
  */
-export function getClassName(node: ts.Node): string {
-  if (!node || !ts.isClassDeclaration(node)) {
-    return '';
-  }
-  return node.name?.text ?? '';
-}
+export const getClassName = (node: ts.Node): string =>
+  node && ts.isClassDeclaration(node) ? (node.name?.text ?? "") : "";
 
-export function getReferenceTypeName(
+/**
+ * Checks if a node is a property declaration or get accessor.
+ * @param node - The node to check.
+ * @returns True if the node is a property declaration or get accessor.
+ */
+const isPropertyLike = (
+  node: ts.Node
+): node is ts.PropertyDeclaration | ts.GetAccessorDeclaration =>
+  ts.isPropertyDeclaration(node) || ts.isGetAccessorDeclaration(node);
+
+/**
+ * Gets the type node from a property-like declaration.
+ * @param node - The property or get accessor node.
+ * @returns The type node or undefined.
+ */
+const getTypeNode = (
+  node: ts.PropertyDeclaration | ts.GetAccessorDeclaration
+): ts.TypeNode | undefined => node.type;
+
+/**
+ * Extracts the type name from a property declaration with a type reference.
+ * @param node - The property declaration or get accessor node.
+ * @param sourceCode - The source file for text extraction.
+ * @returns The resolved type name or default data type.
+ */
+export const getReferenceTypeName = (
   node: ts.Node,
   sourceCode: ts.SourceFile
-): string {
-  if (!node) {
+): string => {
+  if (!node || !isPropertyLike(node)) {
     return DEFAULT_DATA_TYPE;
   }
-  if (!ts.isPropertyDeclaration(node) || !node.type) {
+
+  const typeNode = getTypeNode(node);
+  if (!typeNode) {
     return DEFAULT_DATA_TYPE;
   }
-  if (!ts.isTypeReferenceNode(node.type)) {
-    return node.type.getText(sourceCode) || DEFAULT_DATA_TYPE;
+
+  if (!ts.isTypeReferenceNode(typeNode)) {
+    return typeNode.getText(sourceCode) || DEFAULT_DATA_TYPE;
   }
-  const entityName = node.type?.typeName;
+
+  const entityName = typeNode.typeName;
   if (!entityName || !ts.isIdentifier(entityName)) {
     return DEFAULT_DATA_TYPE;
   }
-  if (entityName.getText(sourceCode) !== EVENT_EMITTER_TYPE) {
-    const [type] = node.type.typeArguments ?? [];
-    return type.getText(sourceCode) || DEFAULT_DATA_TYPE;
-  }
-  return entityName.getText(sourceCode) || DEFAULT_DATA_TYPE;
-}
 
-export function getLiteralTypeName(
+  const typeName = entityName.getText(sourceCode);
+  const [typeArg] = typeNode.typeArguments ?? [];
+
+  // For EventEmitter<T>, extract T; otherwise return the type or its argument
+  if (typeName === EVENT_EMITTER_TYPE) {
+    return typeArg?.getText(sourceCode) || DEFAULT_DATA_TYPE;
+  }
+
+  return typeArg?.getText(sourceCode) || typeName || DEFAULT_DATA_TYPE;
+};
+
+/**
+ * Determines the type name from a property's type annotation or declaration.
+ * @param node - The property node.
+ * @param sourceCode - The source file for text extraction.
+ * @returns The resolved type name.
+ */
+export const getTypeName = (
   node: ts.Node,
   sourceCode: ts.SourceFile
-): string {
-  if (!node || !ts.isVariableDeclaration(node)) {
-    return DEFAULT_DATA_TYPE;
-  }
-  if (!ts.isPropertyDeclaration(node)) {
-    return DEFAULT_DATA_TYPE;
-  }
-  const initializer: ts.Node | undefined = node;
-  if (!initializer) {
-    return DEFAULT_DATA_TYPE;
-  }
-  if (ts.isStringLiteral(initializer)) {
-    return DataType.STRING;
-  }
-  if (ts.isNumericLiteral(initializer)) {
-    return DataType.NUMBER;
-  }
-  if (ts.isLiteralTypeNode(initializer)) {
-    switch (initializer.literal.kind) {
-      case ts.SyntaxKind.StringLiteral:
-        return DataType.STRING;
-      case ts.SyntaxKind.NumericLiteral:
-        return DataType.NUMBER;
-      case ts.SyntaxKind.TrueKeyword:
-      case ts.SyntaxKind.FalseKeyword:
-        return DataType.BOOLEAN;
-      default:
-        return DEFAULT_DATA_TYPE;
-    }
-  }
-  if (ts.isArrayLiteralExpression(initializer)) {
-    const [typeNode] = initializer?.elements ?? [];
-    const elementType = typeNode
-      ? getLiteralTypeName(typeNode, sourceCode)
-      : DEFAULT_DATA_TYPE;
-    return `${elementType}[]`;
-  }
-  return DEFAULT_DATA_TYPE;
-}
+): string =>
+  ts.isPropertyDeclaration(node) || ts.isGetAccessorDeclaration(node)
+    ? getReferenceTypeName(node, sourceCode)
+    : "";
+
+/** Mapping of boolean type values for snippet completion. */
+export const BOOLEAN_VALUES = "|true,false|" as const;
