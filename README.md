@@ -50,8 +50,59 @@ Angular projects.
 ### Usage
 
 1. Open the project in VS Code.
-2. Run the extension in the VS Code debugger.
-3. Use the command palette (`Ctrl+Shift+P` or `Cmd+Shift+P` on macOS) to access the snippet generator commands.
+2. Press `F5` to launch the Extension Development Host.
+3. In the new VS Code window, open an Angular project.
+4. **Right-click on any folder** in the Explorer sidebar.
+5. Select **"Create Angular Snippets"** from the context menu.
+6. The extension will:
+   - Scan the folder recursively for Angular component files (`.component.ts`)
+   - Parse each component to extract inputs, outputs, and metadata
+   - Generate VS Code snippets with proper tab stops and placeholders
+   - Save the snippets based on your configuration (see below)
+7. Start typing the component selector in any HTML file to use the generated snippets.
+
+### Configuration
+
+Configure where snippets are saved via VS Code settings:
+
+| Setting | Options | Description |
+| ------- | ------- | ----------- |
+| `angularSnippetGenerator.snippetLocation` | `workspace` (default) | Save to `.vscode/angular.code-snippets` in your project |
+| | `user` | Save to your global VS Code user snippets folder |
+| | `ask` | Prompt each time to choose the location |
+
+**Workspace (`.vscode` folder)** is recommended for team projects because:
+
+- Snippets are project-specific and relevant to your Angular components
+- Can be committed to version control and shared with teammates
+- Keeps your global snippets folder clean
+
+**User snippets** are useful when you want snippets available across all projects.
+
+### Generated Snippet Example
+
+For a component like:
+
+```typescript
+@Component({
+  selector: 'app-save-button'
+})
+export class SaveButtonComponent {
+  @Input() label: string;
+  @Input() disabled: boolean;
+  @Output() save = new EventEmitter<void>();
+}
+```
+
+The extension generates a snippet that expands to:
+
+```html
+<app-save-button
+  [label]="$1"
+  [disabled]="${2|true,false|}"
+  (save)="$3:onSave($event)"
+></app-save-button>
+```
 
 ## Development
 

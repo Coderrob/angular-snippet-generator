@@ -1,14 +1,45 @@
+/**
+ * MIT License
+ * Copyright (c) 2026 Rob "Coderrob" Lindley
+ */
+
 import * as assert from "node:assert";
 
-// You can import and use all API from the 'vscode' module
-// as well as import your extension to test it
-import * as vscode from "vscode";
+import { mergeSnippet } from "../../extension";
 
-suite("Extension Test Suite", () => {
-  vscode.window.showInformationMessage("Start all tests.");
+suite("extension", () => {
+  suite("mergeSnippet", () => {
+    test("should merge snippet into accumulated object", () => {
+      const accumulated = { existing: { body: ["test"] } };
+      const snippet = {
+        "New Snippet": {
+          body: ["new"],
+          description: "test",
+          prefix: ["prefix"],
+          scope: "html",
+        },
+      };
+      const result = mergeSnippet(accumulated, snippet);
+      assert.deepStrictEqual(result, { ...accumulated, ...snippet });
+    });
 
-  test("Sample test", () => {
-    assert.strictEqual(-1, [1, 2, 3].indexOf(5));
-    assert.strictEqual(-1, [1, 2, 3].indexOf(0));
+    test("should return accumulated when snippet is undefined", () => {
+      const accumulated = { existing: { body: ["test"] } };
+      const result = mergeSnippet(accumulated, undefined);
+      assert.deepStrictEqual(result, accumulated);
+    });
+
+    test("should handle empty accumulated object", () => {
+      const snippet = {
+        "New Snippet": {
+          body: ["new"],
+          description: "test",
+          prefix: ["prefix"],
+          scope: "html",
+        },
+      };
+      const result = mergeSnippet({}, snippet);
+      assert.deepStrictEqual(result, snippet);
+    });
   });
 });
