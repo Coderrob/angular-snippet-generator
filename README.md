@@ -1,6 +1,13 @@
 # Angular Snippet Generator
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<p align="center">
+  <img
+    src="public/img/angular-snippet-generator.png"
+    alt="Angular Snippet Generator logo"
+  />
+</p>
+
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 ![Coverage](https://img.shields.io/badge/coverage-99%25-brightgreen.svg)
 [![ESLint](https://img.shields.io/badge/ESLint-9.x-4B32C3.svg)](https://eslint.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6.svg)](https://www.typescriptlang.org/)
@@ -206,7 +213,7 @@ If you encounter any issues or have questions, please open an issue on the
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details.
 
 ## Ownership
 

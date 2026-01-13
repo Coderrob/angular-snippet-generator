@@ -1,12 +1,12 @@
 {
   "all": true,
-  "check-coverage": true,
-  "include": ["out/**/*.js"],
-  "exclude": ["out/test/**", "out/extension.js"],
-  "reporter": ["text", "html", "lcov"],
-  "report-dir": "coverage",
   "branches": 92,
-  "lines": 95,
+  "check-coverage": true,
+  "exclude": ["out/test/**", "out/extension.js"],
   "functions": 95,
+  "include": ["out/**/*.js"],
+  "lines": 95,
+  "report-dir": "coverage",
+  "reporter": ["text", "html", "lcov"],
   "statements": 95
 }

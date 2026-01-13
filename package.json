@@ -1,8 +1,9 @@
 {
   "author": "Rob Lindley",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "name": "angular-snippet-generator",
   "displayName": "Angular Snippet Generator",
+  "icon": "public/img/angular-snippet-generator-icon.png",
   "description": "A Visual Studio Code extension to generate Angular code snippets.",
   "version": "0.0.1",
   "repository": {

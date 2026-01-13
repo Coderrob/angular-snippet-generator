@@ -36,7 +36,24 @@ export default tseslint.config(
       prettier: prettierPlugin,
     },
     rules: {
-      "@typescript-eslint/naming-convention": "warn",
+      "@typescript-eslint/naming-convention": [
+        "warn",
+        {
+          selector: "enumMember",
+          format: ["UPPER_CASE"],
+        },
+        {
+          selector: "variable",
+          modifiers: ["const"],
+          format: ["camelCase", "UPPER_CASE"],
+        },
+        {
+          selector: "default",
+          format: ["camelCase", "PascalCase"],
+          leadingUnderscore: "allow",
+          trailingUnderscore: "allow",
+        },
+      ],
       "@typescript-eslint/no-unused-vars": [
         "error",
         {
