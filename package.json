@@ -2,7 +2,7 @@
   "author": "Rob Lindley",
   "license": "Apache-2.0",
   "name": "angular-code-snippet-generator",
-  "displayName": "Angular Snippet Generator",
+  "displayName": "Angular Code Snippet Generator",
   "icon": "public/img/angular-code-snippet-generator-icon.png",
   "description": "A Visual Studio Code extension to generate Angular code snippets.",
   "version": "0.0.1",
@@ -23,7 +23,7 @@
     "commands": [
       {
         "command": "angular-code-snippet-generator.createSnippets",
-        "title": "Create Angular Snippets"
+        "title": "Create Angular Code Snippets"
       }
     ],
     "menus": {
@@ -36,7 +36,7 @@
       ]
     },
     "configuration": {
-      "title": "Angular Snippet Generator",
+      "title": "Angular Code Snippet Generator",
       "properties": {
         "angularSnippetGenerator.snippetLocation": {
           "type": "string",
@@ -51,7 +51,7 @@
             "Save snippets to your global VS Code user snippets folder",
             "Ask where to save each time snippets are generated"
           ],
-          "description": "Where to save the generated Angular snippets."
+          "description": "Where to save the generated Angular code snippets."
         }
       }
     }

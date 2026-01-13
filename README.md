@@ -1,9 +1,9 @@
-﻿# Angular Snippet Generator
+﻿# Angular Code Snippet Generator
 
 <p align="center">
   <img
     src="public/img/angular-code-snippet-generator-logo.png"
-    alt="Angular Snippet Generator logo"
+    alt="Angular Code Snippet Generator logo"
   />
 </p>
 
@@ -14,7 +14,7 @@
 
 ## Overview
 
-Angular Snippet Generator is a Visual Studio Code extension designed to streamline
+Angular Code Snippet Generator is a Visual Studio Code extension designed to streamline
 Angular development by automatically generating code snippets from component, directive, and pipe source files.
 It simplifies repetitive tasks, improves productivity, and ensures consistency in your
 Angular projects.
@@ -59,7 +59,7 @@ Angular projects.
 2. Press `F5` to launch the Extension Development Host.
 3. In the new VS Code window, open an Angular project.
 4. **Right-click on any folder** in the Explorer sidebar.
-5. Select **"Create Angular Snippets"** from the context menu.
+5. Select **"Create Angular Code Snippets"** from the context menu.
 6. The extension will:
    - Scan the folder recursively for Angular files (`.component.ts`, `.directive.ts`, `.pipe.ts`)
    - Parse each file to extract inputs, outputs, and metadata

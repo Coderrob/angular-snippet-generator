@@ -128,7 +128,7 @@ const promptForLocation = async (
   });
 
   const selected = await vscode.window.showQuickPick(items, {
-    placeHolder: "Where would you like to save the Angular snippets?",
+    placeHolder: "Where would you like to save the Angular code snippets?",
     title: "Select Snippet Location",
   });
 
@@ -217,7 +217,7 @@ const saveSnippets = (
 };
 
 /**
- * Generates Angular snippets from a directory of Angular files.
+ * Generates Angular code snippets from a directory of Angular files.
  * Supports components, directives, and pipes.
  * @param dirPath - The directory path to scan for Angular files.
  * @returns Object containing the generated snippets and count.
@@ -262,7 +262,7 @@ export const mergeSnippet = (
 };
 
 /**
- * Command handler for creating Angular snippets from a directory.
+ * Command handler for creating Angular code snippets from a directory.
  * @param uri - The URI of the selected folder.
  */
 const createSnippetsCommand = async (uri: vscode.Uri): Promise<void> => {
@@ -293,7 +293,7 @@ const createSnippetsCommand = async (uri: vscode.Uri): Promise<void> => {
     const locationLabel = isWorkspace ? "workspace .vscode" : "user snippets";
 
     vscode.window.showInformationMessage(
-      `Generated ${count} Angular snippet(s) to ${locationLabel}: ${snippetsPath}`
+      `Generated ${count} Angular code snippet(s) to ${locationLabel}: ${snippetsPath}`
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
@@ -302,7 +302,7 @@ const createSnippetsCommand = async (uri: vscode.Uri): Promise<void> => {
 };
 
 /**
- * Activates the Angular Snippet Generator extension.
+ * Activates the Angular Code Snippet Generator extension.
  * @param context - The VS Code extension context.
  */
 export function activate(context: vscode.ExtensionContext): void {
@@ -314,7 +314,7 @@ export function activate(context: vscode.ExtensionContext): void {
 }
 
 /**
- * Deactivates the Angular Snippet Generator extension.
+ * Deactivates the Angular Code Snippet Generator extension.
  */
 export function deactivate(): void {
   // No cleanup required

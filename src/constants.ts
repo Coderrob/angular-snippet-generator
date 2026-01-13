@@ -44,7 +44,7 @@ export enum Path {
   APPDATA_ENV = "APPDATA",
 }
 
-/** Filename for generated Angular snippets. */
+/** Filename for generated Angular code snippets. */
 export const SNIPPETS_FILENAME = "angular.code-snippets";
 
 /** Operating system platform identifiers. */
