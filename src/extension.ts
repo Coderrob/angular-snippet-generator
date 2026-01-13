@@ -307,7 +307,7 @@ const createSnippetsCommand = async (uri: vscode.Uri): Promise<void> => {
  */
 export function activate(context: vscode.ExtensionContext): void {
   const disposable = vscode.commands.registerCommand(
-    "angular-snippet-generator.createSnippets",
+    "angular-code-snippet-generator.createSnippets",
     createSnippetsCommand
   );
   context.subscriptions.push(disposable);

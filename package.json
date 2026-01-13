@@ -1,14 +1,14 @@
 {
   "author": "Rob Lindley",
   "license": "Apache-2.0",
-  "name": "angular-snippet-generator",
+  "name": "angular-code-snippet-generator",
   "displayName": "Angular Snippet Generator",
-  "icon": "public/img/angular-snippet-generator-icon.png",
+  "icon": "public/img/angular-code-snippet-generator-icon.png",
   "description": "A Visual Studio Code extension to generate Angular code snippets.",
   "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Coderrob/angular-snippet-generator.git"
+    "url": "https://github.com/Coderrob/angular-code-snippet-generator.git"
   },
   "engines": {
     "vscode": "^1.76.0"
@@ -22,7 +22,7 @@
   "contributes": {
     "commands": [
       {
-        "command": "angular-snippet-generator.createSnippets",
+        "command": "angular-code-snippet-generator.createSnippets",
         "title": "Create Angular Snippets"
       }
     ],
@@ -30,7 +30,7 @@
       "explorer/context": [
         {
           "when": "explorerResourceIsFolder",
-          "command": "angular-snippet-generator.createSnippets",
+          "command": "angular-code-snippet-generator.createSnippets",
           "group": "navigation"
         }
       ]
