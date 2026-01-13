@@ -1,28 +1,27 @@
-# Angular Snippet Generator
+﻿# Angular Code Snippet Generator
 
 <p align="center">
   <img
-    src="public/img/angular-snippet-generator.png"
-    alt="Angular Snippet Generator logo"
+    src="public/img/angular-code-snippet-generator-logo.png"
+    alt="Angular Code Snippet Generator logo"
   />
 </p>
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-![Coverage](https://img.shields.io/badge/coverage-99%25-brightgreen.svg)
 [![ESLint](https://img.shields.io/badge/ESLint-9.x-4B32C3.svg)](https://eslint.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6.svg)](https://www.typescriptlang.org/)
 [![Code Style: Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io/)
 
 ## Overview
 
-Angular Snippet Generator is a Visual Studio Code extension designed to streamline
-Angular development by automatically generating code snippets from component source files.
+Angular Code Snippet Generator is a Visual Studio Code extension designed to streamline
+Angular development by automatically generating code snippets from component, directive, and pipe source files.
 It simplifies repetitive tasks, improves productivity, and ensures consistency in your
 Angular projects.
 
 ## Features
 
-- **Automatic Snippet Generation**: Parses Angular component files and generates VS Code snippets.
+- **Automatic Snippet Generation**: Parses Angular components, directives, and pipes.
 - **Input/Output Detection**: Extracts `@Input()` and `@Output()` decorated properties.
 - **Type-Aware**: Generates appropriate snippet placeholders based on property types.
 - **Get Accessor Support**: Handles getter-based input properties.
@@ -39,13 +38,13 @@ Angular projects.
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/Coderrob/angular-snippet-generator.git
+   git clone https://github.com/Coderrob/angular-code-snippet-generator.git
    ```
 
 2. Navigate to the project directory:
 
    ```bash
-   cd angular-snippet-generator
+   cd angular-code-snippet-generator
    ```
 
 3. Install dependencies:
@@ -60,13 +59,13 @@ Angular projects.
 2. Press `F5` to launch the Extension Development Host.
 3. In the new VS Code window, open an Angular project.
 4. **Right-click on any folder** in the Explorer sidebar.
-5. Select **"Create Angular Snippets"** from the context menu.
+5. Select **"Create Angular Code Snippets"** from the context menu.
 6. The extension will:
-   - Scan the folder recursively for Angular component files (`.component.ts`)
-   - Parse each component to extract inputs, outputs, and metadata
+   - Scan the folder recursively for Angular files (`.component.ts`, `.directive.ts`, `.pipe.ts`)
+   - Parse each file to extract inputs, outputs, and metadata
    - Generate VS Code snippets with proper tab stops and placeholders
    - Save the snippets based on your configuration (see below)
-7. Start typing the component selector in any HTML file to use the generated snippets.
+7. Start typing the component selector, directive attribute, or pipe name in any HTML file to use the generated snippets.
 
 ### Configuration
 
@@ -74,7 +73,7 @@ Configure where snippets are saved via VS Code settings:
 
 | Setting | Options | Description |
 | ------- | ------- | ----------- |
-| `angularSnippetGenerator.snippetLocation` | `workspace` (default) | Save to `.vscode/angular.code-snippets` in your project |
+| `angularCodeSnippetGenerator.snippetLocation` | `workspace` (default) | Save to `.vscode/angular.code-snippets` in your project |
 | | `user` | Save to your global VS Code user snippets folder |
 | | `ask` | Prompt each time to choose the location |
 
@@ -129,11 +128,8 @@ The extension generates a snippet that expands to:
 ### Running Tests
 
 ```bash
-# Compile and run unit tests
-npm run compile-tests && npm run test:unit
-
-# Run with coverage
-npm run coverage
+# Run the full test pipeline (compile, build, lint, tests)
+npm test
 ```
 
 ## Code Quality
@@ -144,33 +140,32 @@ This project enforces strict code quality standards:
 
 - **ESLint 9.x** with flat config format
 - **Prettier** for consistent code formatting
-- **JSDoc** required for all exported functions
-- **Import sorting** by groups (builtin → external → internal)
+- **JSDoc** required for function declarations, method definitions, and classes
+- **Import sorting** with `import/order` and `sort-imports`
 
 ### Testing
 
 - **Mocha** test framework with TDD style
-- **Truth table patterns** for comprehensive test coverage
-- **95%+ code coverage** threshold enforced
+- **VS Code test runner** via `@vscode/test-electron`
+- **95%+ code coverage** enforced by c8 (lines, branches, functions, statements)
 
 ### Code Duplication
 
 - **jscpd** checks for code duplication
-- **2% maximum** duplication threshold
 
 ## Project Structure
 
 ```text
 src/
-├── extension.ts    # VS Code extension entry point
-├── files.ts        # File system utilities
-├── nodes.ts        # TypeScript AST node utilities
-├── parser.ts       # Angular component parser
-├── snippet.ts      # Snippet generation logic
-├── strings.ts      # String manipulation utilities
-├── types.ts        # Type definitions and enums
-└── test/
-    └── suite/      # Unit tests
+  extension.ts    # VS Code extension entry point
+  files.ts        # File system utilities
+  nodes.ts        # TypeScript AST node utilities
+  parser.ts       # Angular metadata parser
+  snippet.ts      # Snippet generation logic
+  strings.ts      # String manipulation utilities
+  types.ts        # Type definitions and enums
+  test/
+    suite/        # Unit tests
 ```
 
 ## Best Practices
@@ -184,28 +179,25 @@ src/
 
 ### Code Standards
 
-- All exported functions require JSDoc with `@param` and `@returns`.
-- Use `const` arrow functions for consistency.
-- Prefer early returns over nested conditionals.
-- Use TypeScript strict mode.
+- JSDoc is required for function declarations, method definitions, and classes.
+- TypeScript strict mode is enabled in `tsconfig.json`.
 
 ### Testing Standards
 
-- Test descriptions follow "should ... do X" pattern.
-- Use truth tables for parameterized testing.
+- Test descriptions follow "should ..." patterns.
 - Cover positive cases, negative cases, and edge cases.
 - Mock external dependencies (file system, VS Code API).
 
 ## Support
 
 If you encounter any issues or have questions, please open an issue on the
-[GitHub repository](https://github.com/Coderrob/angular-snippet-generator/issues).
+[GitHub repository](https://github.com/Coderrob/angular-code-snippet-generator/issues).
 
 ## Contributing
 
 1. Fork the repository.
 2. Create a feature branch (`git checkout -b feature/amazing-feature`).
-3. Ensure tests pass (`npm run coverage`).
+3. Ensure tests pass (`npm test`).
 4. Ensure linting passes (`npm run lint`).
 5. Commit changes (`git commit -m 'Add amazing feature'`).
 6. Push to branch (`git push origin feature/amazing-feature`).
