@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 /**
  * MIT License
  * Copyright (c) 2026 Rob "Coderrob" Lindley

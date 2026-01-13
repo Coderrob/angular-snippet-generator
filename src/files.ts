@@ -28,11 +28,17 @@ import path from "node:path";
 export const SUPPORTED_EXTENSIONS = [".ts"] as const;
 
 /**
- * Per Angular naming convention a component should
- * have a file named with a .component.ts suffix.
- * @see https://angular.io/guide/styleguide#file-structure-conventions
+ * Angular file suffixes for supported artifact types.
+ * @see https://angular.dev/style-guide#file-structure-conventions
  */
-export const COMPONENT_SUFFIX = ".component.ts";
+export const ANGULAR_SUFFIXES: string[] = [
+  ".component.ts",
+  ".directive.ts",
+  ".pipe.ts",
+] as const;
+
+/** Type for Angular file suffixes. */
+export type AngularSuffix = (typeof ANGULAR_SUFFIXES)[number];
 
 /**
  * File system abstraction interface for dependency injection.
@@ -81,20 +87,23 @@ export const hasSupportedExtension = (filePath = ""): boolean =>
   );
 
 /**
- * Checks if a file path follows Angular component naming convention.
+ * Checks if a file path follows Angular naming conventions.
+ * Supports components (.component.ts), directives (.directive.ts), and pipes (.pipe.ts).
  * @param filePath - The file path to check.
- * @returns True if the file ends with .component.ts.
+ * @returns True if the file matches an Angular naming pattern.
  */
-export const isComponentFile = (filePath = ""): boolean =>
-  filePath.toLowerCase().endsWith(COMPONENT_SUFFIX);
+export const isAngularFile = (filePath = ""): boolean => {
+  const lowerPath = filePath.toLowerCase();
+  return ANGULAR_SUFFIXES.some((suffix) => lowerPath.endsWith(suffix));
+};
 
 /**
- * Determines if a file is a supported Angular component file.
+ * Determines if a file is a supported Angular file.
  * @param filePath - The file path to validate.
- * @returns True if the file is a supported component file.
+ * @returns True if the file is a supported Angular file.
  */
 export const isSupportedFile = (filePath = ""): boolean =>
-  hasSupportedExtension(filePath) && isComponentFile(filePath);
+  hasSupportedExtension(filePath) && isAngularFile(filePath);
 
 /**
  * Reads file contents from the specified path.

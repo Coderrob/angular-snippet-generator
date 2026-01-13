@@ -30,7 +30,7 @@ import {
   getFileContents,
   getSupportedFiles,
   hasSupportedExtension,
-  isComponentFile,
+  isAngularFile,
   isSupportedFile,
 } from "../../files";
 
@@ -52,7 +52,6 @@ const runBooleanTests = <T>(
 
 suite("files", () => {
   suite("hasSupportedExtension", () => {
-    // Truth table: [input, expected, description]
     const cases: [string | undefined, boolean, string][] = [
       ["/path/to/file.ts", true, "TypeScript file"],
       ["/path/to/file.TS", true, "uppercase TypeScript extension"],
@@ -66,12 +65,15 @@ suite("files", () => {
     runBooleanTests(cases, hasSupportedExtension);
   });
 
-  suite("isComponentFile", () => {
-    // Truth table: [input, expected, description]
+  suite("isAngularFile", () => {
     const cases: [string | undefined, boolean, string][] = [
-      ["/path/test.component.ts", true, "standard component file"],
+      ["/path/test.component.ts", true, "component file"],
       ["/path/TEST.COMPONENT.TS", true, "uppercase component file"],
       ["/path/my-button.component.ts", true, "kebab-case component"],
+      ["/path/highlight.directive.ts", true, "directive file"],
+      ["/path/HIGHLIGHT.DIRECTIVE.TS", true, "uppercase directive file"],
+      ["/path/currency.pipe.ts", true, "pipe file"],
+      ["/path/CURRENCY.PIPE.TS", true, "uppercase pipe file"],
       ["/path/test.module.ts", false, "module file"],
       ["/path/test.service.ts", false, "service file"],
       ["/path/test.ts", false, "plain TypeScript file"],
@@ -79,15 +81,16 @@ suite("files", () => {
       [undefined, false, "undefined"],
     ];
 
-    runBooleanTests(cases, isComponentFile);
+    runBooleanTests(cases, isAngularFile);
   });
 
   suite("isSupportedFile", () => {
-    // Positive cases
     const validCases: [string, string][] = [
       [String.raw`c:\some\path\some.component.ts`, "Windows path component"],
       ["/some/path/test.component.ts", "Unix path component"],
-      ["/PATH/TEST.COMPONENT.TS", "uppercase path"],
+      ["/PATH/TEST.COMPONENT.TS", "uppercase component"],
+      ["/some/path/highlight.directive.ts", "directive file"],
+      ["/some/path/currency.pipe.ts", "pipe file"],
     ];
 
     validCases.forEach(([input, description]) => {
@@ -96,7 +99,6 @@ suite("files", () => {
       });
     });
 
-    // Negative cases
     const invalidCases: [string | undefined, string][] = [
       [String.raw`c:\some\path\some.module.ts`, "module file"],
       ["/some/path/index.ts", "plain TypeScript file"],

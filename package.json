@@ -5,6 +5,10 @@
   "displayName": "Angular Snippet Generator",
   "description": "A Visual Studio Code extension to generate Angular code snippets.",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Coderrob/angular-snippet-generator.git"
+  },
   "engines": {
     "vscode": "^1.76.0"
   },
@@ -64,6 +68,10 @@
     "compile": "webpack",
     "watch": "webpack --watch",
     "package": "webpack --mode production --devtool hidden-source-map",
+    "ext:build": "npm run compile",
+    "ext:package": "npx @vscode/vsce package",
+    "ext:install": "node -e \"const fs=require('fs');const {execSync}=require('child_process');const files=fs.readdirSync('.').filter(f=>f.endsWith('.vsix'));if(!files.length){console.error('No .vsix found. Run: npm run ext:package');process.exit(1);}const latest=files.sort((a,b)=>fs.statSync(b).mtimeMs-fs.statSync(a).mtimeMs)[0];console.log('Installing', latest);execSync('code --install-extension '+latest,{stdio:'inherit'});\"",
+    "ext:reinstall": "npm run ext:package && npm run ext:install",
     "compile-tests": "tsc -p . --outDir out",
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "npm run compile-tests && npm run compile && npm run lint",

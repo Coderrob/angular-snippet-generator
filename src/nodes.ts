@@ -93,6 +93,26 @@ export const isComponent = (node: ts.Decorator): boolean =>
   isIdentifier(node.expression.expression, DecoratorType.COMPONENT);
 
 /**
+ * Checks if a decorator is an Angular @Directive decorator.
+ * @param node - The decorator node to check.
+ * @returns True if the decorator is a Directive decorator.
+ */
+export const isDirective = (node: ts.Decorator): boolean =>
+  !!node &&
+  ts.isCallExpression(node.expression) &&
+  isIdentifier(node.expression.expression, DecoratorType.DIRECTIVE);
+
+/**
+ * Checks if a decorator is an Angular @Pipe decorator.
+ * @param node - The decorator node to check.
+ * @returns True if the decorator is a Pipe decorator.
+ */
+export const isPipe = (node: ts.Decorator): boolean =>
+  !!node &&
+  ts.isCallExpression(node.expression) &&
+  isIdentifier(node.expression.expression, DecoratorType.PIPE);
+
+/**
  * Extracts the alias name from a decorator call expression.
  * @param node - The call expression node.
  * @returns The alias string or empty string if not found.

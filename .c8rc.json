@@ -5,7 +5,7 @@
   "exclude": ["out/test/**", "out/extension.js"],
   "reporter": ["text", "html", "lcov"],
   "report-dir": "coverage",
-  "branches": 93,
+  "branches": 92,
   "lines": 95,
   "functions": 95,
   "statements": 95

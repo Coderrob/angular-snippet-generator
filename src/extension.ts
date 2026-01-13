@@ -27,20 +27,23 @@ import path from "node:path";
 
 import * as vscode from "vscode";
 
+import {
+  ConfigKey,
+  Path,
+  Platform,
+  SnippetLocation,
+  SNIPPETS_FILENAME,
+} from "./constants";
 import { getFileContents, getSupportedFiles } from "./files";
-import { parseComponent } from "./parser";
+import { parseAngularFile } from "./parser";
 import { createSnippet } from "./snippet";
 import { Snippet } from "./types";
 
-/** The filename for the generated snippets file. */
-const SNIPPETS_FILENAME = "angular.code-snippets";
-
-/** Snippet location options. */
-type SnippetLocation = "workspace" | "user" | "ask";
-
 /** Quick pick items for location selection. */
 interface LocationQuickPickItem extends vscode.QuickPickItem {
-  readonly location: "workspace" | "user";
+  readonly location:
+    | typeof SnippetLocation.WORKSPACE
+    | typeof SnippetLocation.USER;
 }
 
 /**
@@ -51,24 +54,31 @@ const getUserSnippetsDirectory = (): string => {
   const homeDir = os.homedir();
 
   switch (process.platform) {
-    case "win32":
+    case Platform.WINDOWS:
       return path.join(
-        process.env["APPDATA"] || path.join(homeDir, "AppData", "Roaming"),
-        "Code",
-        "User",
-        "snippets"
+        process.env[Path.APPDATA_ENV] ||
+          path.join(homeDir, "AppData", "Roaming"),
+        Path.CODE_DIR,
+        Path.USER_DIR,
+        Path.SNIPPETS_DIR
       );
-    case "darwin":
+    case Platform.MACOS:
       return path.join(
         homeDir,
         "Library",
         "Application Support",
-        "Code",
-        "User",
-        "snippets"
+        Path.CODE_DIR,
+        Path.USER_DIR,
+        Path.SNIPPETS_DIR
       );
     default:
-      return path.join(homeDir, ".config", "Code", "User", "snippets");
+      return path.join(
+        homeDir,
+        Path.CONFIG_DIR,
+        Path.CODE_DIR,
+        Path.USER_DIR,
+        Path.SNIPPETS_DIR
+      );
   }
 };
 
@@ -83,7 +93,7 @@ const getWorkspaceSnippetsDirectory = (
   if (!workspaceFolder) {
     return undefined;
   }
-  return path.join(workspaceFolder.uri.fsPath, ".vscode");
+  return path.join(workspaceFolder.uri.fsPath, Path.VSCODE_DIR);
 };
 
 /**
@@ -91,8 +101,11 @@ const getWorkspaceSnippetsDirectory = (
  * @returns The configured location preference.
  */
 const getSnippetLocationConfig = (): SnippetLocation => {
-  const config = vscode.workspace.getConfiguration("angularSnippetGenerator");
-  return config.get<SnippetLocation>("snippetLocation", "workspace");
+  const config = vscode.workspace.getConfiguration(ConfigKey.SECTION);
+  return config.get<SnippetLocation>(
+    ConfigKey.SNIPPET_LOCATION,
+    SnippetLocation.WORKSPACE
+  );
 };
 
 /**
@@ -102,7 +115,7 @@ const getSnippetLocationConfig = (): SnippetLocation => {
  */
 const promptForLocation = async (
   hasWorkspace: boolean
-): Promise<"workspace" | "user" | undefined> => {
+): Promise<SnippetLocation | undefined> => {
   const items: LocationQuickPickItem[] = [];
 
   if (hasWorkspace) {
@@ -110,7 +123,7 @@ const promptForLocation = async (
       label: "$(folder) Workspace (.vscode folder)",
       description: "Recommended for team projects",
       detail: "Snippets will be saved to .vscode/angular.code-snippets",
-      location: "workspace",
+      location: SnippetLocation.WORKSPACE,
     });
   }
 
@@ -118,7 +131,7 @@ const promptForLocation = async (
     label: "$(home) User Snippets",
     description: "Available across all projects",
     detail: "Snippets will be saved to your global VS Code snippets folder",
-    location: "user",
+    location: SnippetLocation.USER,
   });
 
   const selected = await vscode.window.showQuickPick(items, {
@@ -140,21 +153,21 @@ const resolveSnippetsDirectory = async (
   const workspaceFolder = vscode.workspace.getWorkspaceFolder(uri);
   const configuredLocation = getSnippetLocationConfig();
 
-  if (configuredLocation === "ask") {
+  if (configuredLocation === SnippetLocation.ASK) {
     const location = await promptForLocation(!!workspaceFolder);
     if (!location) {
       return undefined;
     }
-    return location === "workspace" && workspaceFolder
+    return location === SnippetLocation.WORKSPACE && workspaceFolder
       ? getWorkspaceSnippetsDirectory(workspaceFolder)
       : getUserSnippetsDirectory();
   }
 
-  if (configuredLocation === "workspace" && workspaceFolder) {
+  if (configuredLocation === SnippetLocation.WORKSPACE && workspaceFolder) {
     return getWorkspaceSnippetsDirectory(workspaceFolder);
   }
 
-  if (configuredLocation === "workspace" && !workspaceFolder) {
+  if (configuredLocation === SnippetLocation.WORKSPACE && !workspaceFolder) {
     vscode.window.showWarningMessage(
       "No workspace folder found. Saving to user snippets instead."
     );
@@ -211,23 +224,24 @@ const saveSnippets = (
 };
 
 /**
- * Generates Angular snippets from a directory of component files.
- * @param dirPath - The directory path to scan for Angular components.
+ * Generates Angular snippets from a directory of Angular files.
+ * Supports components, directives, and pipes.
+ * @param dirPath - The directory path to scan for Angular files.
  * @returns Object containing the generated snippets and count.
  */
 const generateSnippetsFromDirectory = (
   dirPath: string
 ): { snippets: Record<string, unknown>; count: number } => {
-  const componentFiles = getSupportedFiles(dirPath);
+  const angularFiles = getSupportedFiles(dirPath);
   const snippets: Record<string, unknown> = {};
   let count = 0;
 
-  for (const filePath of componentFiles) {
+  for (const filePath of angularFiles) {
     const fileContents = getFileContents(filePath);
-    const componentInfo = parseComponent(fileContents);
+    const angularInfo = parseAngularFile(fileContents);
 
-    if (componentInfo) {
-      const snippet = createSnippet(componentInfo);
+    if (angularInfo) {
+      const snippet = createSnippet(angularInfo);
       if (snippet) {
         Object.assign(snippets, snippet);
         count++;
@@ -259,7 +273,7 @@ export const mergeSnippet = (
  * @param uri - The URI of the selected folder.
  */
 const createSnippetsCommand = async (uri: vscode.Uri): Promise<void> => {
-  if (!uri || !uri.fsPath) {
+  if (!uri?.fsPath) {
     vscode.window.showErrorMessage(
       "Please select a folder to generate snippets from."
     );
@@ -282,7 +296,7 @@ const createSnippetsCommand = async (uri: vscode.Uri): Promise<void> => {
     }
 
     const snippetsPath = saveSnippets(snippets, snippetsDir);
-    const isWorkspace = snippetsDir.includes(".vscode");
+    const isWorkspace = snippetsDir.includes(Path.VSCODE_DIR);
     const locationLabel = isWorkspace ? "workspace .vscode" : "user snippets";
 
     vscode.window.showInformationMessage(

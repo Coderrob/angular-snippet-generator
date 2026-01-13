@@ -15,24 +15,26 @@ import {
   getTypeName,
   isComponent,
   isDecorator,
+  isDirective,
   isIdentifier,
+  isPipe,
   isPropertyOrGetAccessor,
 } from "../../nodes";
 import { DecoratorType } from "../../types";
 
 /**
  * Helper to create a source file from code string.
- * @param code - The TypeScript code.
- * @returns The parsed source file.
+ * @param code Code string to parse.
+ * @returns Parsed source file.
  */
 const createSource = (code: string): ts.SourceFile =>
   ts.createSourceFile("test.ts", code, ts.ScriptTarget.Latest, true);
 
 /**
  * Helper to find first matching node in AST.
- * @param source - The source file.
- * @param predicate - Node predicate function.
- * @returns The first matching node or undefined.
+ * @param source Source file.
+ * @param predicate Node predicate.
+ * @returns First matching node or undefined.
  */
 const findNode = <T extends ts.Node>(
   source: ts.SourceFile,
@@ -52,9 +54,9 @@ const findNode = <T extends ts.Node>(
 };
 
 /**
- * Runs test cases for functions that accept a node and source file.
- * @param cases - Array of [code, expected, desc, predicate] tuples.
- * @param fn - Function under test.
+ * Runs test cases for functions accepting a node and source file.
+ * @param cases Test cases [code, expected, desc, predicate].
+ * @param fn Function under test.
  */
 const runNodeTests = <T>(
   cases: [string, T, string, (n: ts.Node) => n is ts.Node][],
@@ -152,12 +154,12 @@ suite("nodes", () => {
       assert.strictEqual(isIdentifier(idNode, "test"), true);
     });
 
-    const falseCases: [string | undefined, string, string][] = [
+    const cases: [string | undefined, string, string][] = [
       ["const test = 1;", "other", "non-matching identifier"],
       [undefined, "test", "undefined node"],
       ["const x = 1;", "x", "numeric literal node"],
     ];
-    falseCases.forEach(([code, name, desc]) => {
+    cases.forEach(([code, name, desc]) => {
       test(`should return false for ${desc}`, () => {
         if (!code) {
           assert.strictEqual(
@@ -210,6 +212,47 @@ suite("nodes", () => {
         isComponent(undefined as unknown as ts.Decorator),
         false
       );
+    });
+  });
+
+  suite("isDirective", () => {
+    const cases: [string, boolean, string][] = [
+      ["@Directive({}) class A {}", true, "Directive decorator"],
+      ["@Injectable() class A {}", false, "non-Directive decorator"],
+    ];
+    cases.forEach(([code, expected, desc]) => {
+      test(`should return ${expected} for ${desc}`, () => {
+        const source = createSource(code);
+        const decNode = findNode(source, ts.isDecorator);
+        assert.ok(decNode);
+        assert.strictEqual(isDirective(decNode), expected);
+      });
+    });
+
+    test("should return false for undefined decorator", () => {
+      assert.strictEqual(
+        isDirective(undefined as unknown as ts.Decorator),
+        false
+      );
+    });
+  });
+
+  suite("isPipe", () => {
+    const cases: [string, boolean, string][] = [
+      ["@Pipe({}) class A {}", true, "Pipe decorator"],
+      ["@Injectable() class A {}", false, "non-Pipe decorator"],
+    ];
+    cases.forEach(([code, expected, desc]) => {
+      test(`should return ${expected} for ${desc}`, () => {
+        const source = createSource(code);
+        const decNode = findNode(source, ts.isDecorator);
+        assert.ok(decNode);
+        assert.strictEqual(isPipe(decNode), expected);
+      });
+    });
+
+    test("should return false for undefined decorator", () => {
+      assert.strictEqual(isPipe(undefined as unknown as ts.Decorator), false);
     });
   });
 

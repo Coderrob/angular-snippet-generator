@@ -23,10 +23,14 @@
 
 /* eslint-disable @typescript-eslint/naming-convention */
 
+import { ArtifactKind } from "./constants";
+
 /**
  * Represents an Angular component's metadata extracted from source code.
  */
 export interface ComponentInfo {
+  /** The type of Angular artifact. */
+  readonly kind: typeof ArtifactKind.COMPONENT;
   /** The class name of the component. */
   readonly className: string;
   /** The component's selector attribute value. */
@@ -36,6 +40,39 @@ export interface ComponentInfo {
   /** The component's @Output decorated properties. */
   readonly outputs: readonly Property[];
 }
+
+/**
+ * Represents an Angular directive's metadata extracted from source code.
+ */
+export interface DirectiveInfo {
+  /** The type of Angular artifact. */
+  readonly kind: typeof ArtifactKind.DIRECTIVE;
+  /** The class name of the directive. */
+  readonly className: string;
+  /** The directive's selector attribute value (typically an attribute selector). */
+  readonly selector: string;
+  /** The directive's @Input decorated properties. */
+  readonly inputs: readonly Property[];
+  /** The directive's @Output decorated properties. */
+  readonly outputs: readonly Property[];
+}
+
+/**
+ * Represents an Angular pipe's metadata extracted from source code.
+ */
+export interface PipeInfo {
+  /** The type of Angular artifact. */
+  readonly kind: typeof ArtifactKind.PIPE;
+  /** The class name of the pipe. */
+  readonly className: string;
+  /** The pipe's name used in templates. */
+  readonly name: string;
+}
+
+/**
+ * Union type for all Angular artifact metadata.
+ */
+export type AngularInfo = ComponentInfo | DirectiveInfo | PipeInfo;
 
 /**
  * Represents an Angular component property with its name and type.
@@ -74,6 +111,8 @@ export enum PropertyKind {
  */
 export enum DecoratorType {
   COMPONENT = "Component",
+  DIRECTIVE = "Directive",
+  PIPE = "Pipe",
   INPUT = "Input",
   OUTPUT = "Output",
 }
@@ -92,6 +131,9 @@ export enum DataType {
 
 /** The property name used for component selectors in Angular decorators. */
 export const SELECTOR_PROPERTY = "selector";
+
+/** The property name used for pipe names in Angular decorators. */
+export const NAME_PROPERTY = "name";
 
 /** Default data type when type cannot be determined. */
 export const DEFAULT_DATA_TYPE = DataType.ANY;

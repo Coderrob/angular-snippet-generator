@@ -21,8 +21,17 @@
  * SOFTWARE.
  */
 
+import { ArtifactKind } from "./constants";
 import { kebabToTitleCase, upperCaseFirstCharacter } from "./strings";
-import { ComponentInfo, DataType, Property, Snippet } from "./types";
+import {
+  AngularInfo,
+  ComponentInfo,
+  DataType,
+  DirectiveInfo,
+  PipeInfo,
+  Property,
+  Snippet,
+} from "./types";
 
 /** Indentation for snippet body attributes. */
 const INDENT = "  ";
@@ -109,7 +118,7 @@ const mapProperties = (
  * @param component - The component info to create a snippet from.
  * @returns The snippet object or undefined if component is invalid.
  */
-export const createSnippet = (
+export const createComponentSnippet = (
   component: ComponentInfo
 ): Snippet | undefined => {
   const { className, selector, inputs, outputs } = component;
@@ -141,4 +150,95 @@ export const createSnippet = (
       scope: "html",
     },
   };
+};
+
+/**
+ * Cleans a directive selector for use as a snippet prefix.
+ * Removes attribute selector brackets (e.g., "[appHighlight]" -> "appHighlight").
+ * @param selector - The directive selector.
+ * @returns The cleaned selector.
+ */
+const cleanDirectiveSelector = (selector: string): string =>
+  selector.replaceAll(/(?:^\[)|(?:\]$)/g, "");
+
+/**
+ * Creates a VS Code snippet from Angular directive information.
+ * @param directive - The directive info to create a snippet from.
+ * @returns The snippet object or undefined if directive is invalid.
+ */
+export const createDirectiveSnippet = (
+  directive: DirectiveInfo
+): Snippet | undefined => {
+  const { className, selector, inputs, outputs } = directive;
+
+  if (!selector) {
+    return undefined;
+  }
+
+  const cleanSelector = cleanDirectiveSelector(selector);
+  const title = `${formatComponentName(className)} Directive`;
+  let tabIndex = 0;
+
+  const inputResult = mapProperties(inputs, propertyToAttribute, tabIndex);
+  tabIndex = inputResult.nextIndex;
+
+  const outputResult = mapProperties(outputs, propertyToFunction, tabIndex);
+  tabIndex = outputResult.nextIndex;
+
+  // Directive snippets add attributes to existing elements
+  return {
+    [title]: {
+      body: [
+        `${cleanSelector}`,
+        ...inputResult.lines,
+        ...outputResult.lines,
+        `$${tabIndex + 1}`,
+      ],
+      description: `A directive snippet for ${formatComponentName(className)}.`,
+      prefix: [cleanSelector],
+      scope: "html",
+    },
+  };
+};
+
+/**
+ * Creates a VS Code snippet from Angular pipe information.
+ * @param pipe - The pipe info to create a snippet from.
+ * @returns The snippet object or undefined if pipe is invalid.
+ */
+export const createPipeSnippet = (pipe: PipeInfo): Snippet | undefined => {
+  const { className, name } = pipe;
+
+  if (!name) {
+    return undefined;
+  }
+
+  const title = `${formatComponentName(className)} Pipe`;
+
+  return {
+    [title]: {
+      body: [`{{ $1 | ${name}$2 }}`],
+      description: `A pipe snippet for ${formatComponentName(className)}.`,
+      prefix: [name, `| ${name}`],
+      scope: "html",
+    },
+  };
+};
+
+/**
+ * Creates a VS Code snippet from any Angular artifact information.
+ * @param info - The Angular info to create a snippet from.
+ * @returns The snippet object or undefined if info is invalid.
+ */
+export const createSnippet = (info: AngularInfo): Snippet | undefined => {
+  switch (info.kind) {
+    case ArtifactKind.COMPONENT:
+      return createComponentSnippet(info);
+    case ArtifactKind.DIRECTIVE:
+      return createDirectiveSnippet(info);
+    case ArtifactKind.PIPE:
+      return createPipeSnippet(info);
+    default:
+      return undefined;
+  }
 };

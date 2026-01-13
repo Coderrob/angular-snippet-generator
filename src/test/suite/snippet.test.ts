@@ -24,7 +24,10 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import assert from "node:assert";
 
+import { ArtifactKind } from "../../constants";
 import {
+  createDirectiveSnippet,
+  createPipeSnippet,
   createSnippet,
   formatComponentName,
   formatToFunctionName,
@@ -32,11 +35,16 @@ import {
   propertyToAttribute,
   propertyToFunction,
 } from "../../snippet";
-import { ComponentInfo, DataType, Property } from "../../types";
+import {
+  ComponentInfo,
+  DataType,
+  DirectiveInfo,
+  PipeInfo,
+  Property,
+} from "../../types";
 
 suite("snippet", () => {
   suite("formatToFunctionName", () => {
-    // Truth table: [input, expected, description]
     const cases: [string | undefined, string, string][] = [
       ["click", "onClick", "simple event name"],
       ["submit", "onSubmit", "form event"],
@@ -53,7 +61,6 @@ suite("snippet", () => {
   });
 
   suite("formatComponentName", () => {
-    // Truth table: [input, expected, description]
     const cases: [string | undefined, string, string][] = [
       [
         "SaveCancelButtonComponent",
@@ -74,7 +81,6 @@ suite("snippet", () => {
   });
 
   suite("getTypeValues", () => {
-    // Truth table: [type, expected, description]
     const cases: [string | DataType | undefined, string, string][] = [
       [DataType.BOOLEAN, "|true,false|", "boolean type"],
       [DataType.STRING, "", "string type"],
@@ -93,7 +99,6 @@ suite("snippet", () => {
   });
 
   suite("propertyToAttribute", () => {
-    // Truth table: [property, index, expected]
     const cases: [Property, number, string, string][] = [
       [
         { name: "label", type: DataType.STRING },
@@ -124,7 +129,6 @@ suite("snippet", () => {
   });
 
   suite("propertyToFunction", () => {
-    // Truth table: [property, index, expected]
     const cases: [Property, number, string, string][] = [
       [
         { name: "change", type: undefined },
@@ -155,6 +159,7 @@ suite("snippet", () => {
 
   suite("createSnippet", () => {
     const mockComponentInfo: Readonly<ComponentInfo> = {
+      kind: ArtifactKind.COMPONENT,
       className: "SaveCancelButtonComponent",
       selector: "save-cancel-button",
       inputs: [
@@ -197,6 +202,7 @@ suite("snippet", () => {
 
     test("should create snippet for component with only inputs", () => {
       const component: ComponentInfo = {
+        kind: ArtifactKind.COMPONENT,
         className: "ButtonComponent",
         selector: "my-button",
         inputs: [{ name: "label", type: DataType.STRING }],
@@ -209,6 +215,7 @@ suite("snippet", () => {
 
     test("should create snippet for component with only outputs", () => {
       const component: ComponentInfo = {
+        kind: ArtifactKind.COMPONENT,
         className: "ClickerComponent",
         selector: "clicker",
         inputs: [],
@@ -221,13 +228,139 @@ suite("snippet", () => {
 
     test("should return undefined for component without selector", () => {
       const component: ComponentInfo = {
-        className: "InvalidComponent",
+        kind: ArtifactKind.COMPONENT,
+        className: "TestComponent",
         selector: "",
         inputs: [],
         outputs: [],
       };
       const result = createSnippet(component);
       assert.strictEqual(result, undefined);
+    });
+  });
+
+  suite("createDirectiveSnippet", () => {
+    const mockDirectiveInfo: Readonly<DirectiveInfo> = {
+      kind: ArtifactKind.DIRECTIVE,
+      className: "HighlightDirective",
+      selector: "[appHighlight]",
+      inputs: [
+        { name: "appHighlight", type: DataType.STRING },
+        { name: "highlightColor", type: DataType.STRING },
+      ],
+      outputs: [{ name: "highlighted", type: DataType.BOOLEAN }],
+    };
+
+    test("should create snippet for directive with inputs and outputs", () => {
+      const result = createDirectiveSnippet(mockDirectiveInfo);
+      assert.deepStrictEqual(result, {
+        "Highlight Directive Directive": {
+          body: [
+            "appHighlight",
+            '  [appHighlight]="$1"',
+            '  [highlightColor]="$2"',
+            '  (highlighted)="$3:onHighlighted($event)"',
+            "$4",
+          ],
+          description: "A directive snippet for Highlight Directive.",
+          prefix: ["appHighlight"],
+          scope: "html",
+        },
+      });
+    });
+
+    test("should create snippet for directive with only inputs", () => {
+      const directive: DirectiveInfo = {
+        kind: ArtifactKind.DIRECTIVE,
+        className: "TooltipDirective",
+        selector: "[tooltip]",
+        inputs: [{ name: "tooltip", type: DataType.STRING }],
+        outputs: [],
+      };
+      const result = createDirectiveSnippet(directive);
+      assert.ok(result);
+      assert.strictEqual(result["Tooltip Directive Directive"].body.length, 3);
+    });
+
+    test("should return undefined for directive without selector", () => {
+      const directive: DirectiveInfo = {
+        kind: ArtifactKind.DIRECTIVE,
+        className: "TestDirective",
+        selector: "",
+        inputs: [],
+        outputs: [],
+      };
+      const result = createDirectiveSnippet(directive);
+      assert.strictEqual(result, undefined);
+    });
+  });
+
+  suite("createPipeSnippet", () => {
+    const mockPipeInfo: Readonly<PipeInfo> = {
+      kind: ArtifactKind.PIPE,
+      className: "CurrencyFormatPipe",
+      name: "currencyFormat",
+    };
+
+    test("should create snippet for pipe", () => {
+      const result = createPipeSnippet(mockPipeInfo);
+      assert.deepStrictEqual(result, {
+        "Currency Format Pipe Pipe": {
+          body: ["{{ $1 | currencyFormat$2 }}"],
+          description: "A pipe snippet for Currency Format Pipe.",
+          prefix: ["currencyFormat", "| currencyFormat"],
+          scope: "html",
+        },
+      });
+    });
+
+    test("should return undefined for pipe without name", () => {
+      const pipe: PipeInfo = {
+        kind: ArtifactKind.PIPE,
+        className: "InvalidPipe",
+        name: "",
+      };
+      const result = createPipeSnippet(pipe);
+      assert.strictEqual(result, undefined);
+    });
+  });
+
+  suite("createSnippet with different Angular types", () => {
+    test("should delegate to component snippet for component info", () => {
+      const component: ComponentInfo = {
+        kind: ArtifactKind.COMPONENT,
+        className: "TestComponent",
+        selector: "test-comp",
+        inputs: [],
+        outputs: [],
+      };
+      const result = createSnippet(component);
+      assert.ok(result);
+      assert.ok(result["Test Comp"].body[0].includes("<test-comp"));
+    });
+
+    test("should delegate to directive snippet for directive info", () => {
+      const directive: DirectiveInfo = {
+        kind: ArtifactKind.DIRECTIVE,
+        className: "TestDirective",
+        selector: "[testDir]",
+        inputs: [],
+        outputs: [],
+      };
+      const result = createSnippet(directive);
+      assert.ok(result);
+      assert.ok(result["Test Directive Directive"].body[0].includes("testDir"));
+    });
+
+    test("should delegate to pipe snippet for pipe info", () => {
+      const pipe: PipeInfo = {
+        kind: ArtifactKind.PIPE,
+        className: "TestPipe",
+        name: "testPipe",
+      };
+      const result = createSnippet(pipe);
+      assert.ok(result);
+      assert.ok(result["Test Pipe Pipe"].body[0].includes("testPipe"));
     });
   });
 });

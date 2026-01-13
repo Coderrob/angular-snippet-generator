@@ -23,8 +23,14 @@
 
 import assert from "node:assert";
 
-import { parseComponent } from "../../parser";
-import { ComponentInfo } from "../../types";
+import { ArtifactKind } from "../../constants";
+import {
+  parseAngularFile,
+  parseComponent,
+  parseDirective,
+  parsePipe,
+} from "../../parser";
+import { ComponentInfo, DirectiveInfo, PipeInfo } from "../../types";
 
 suite("parser", () => {
   const mockComponentData = `
@@ -63,6 +69,7 @@ suite("parser", () => {
 	`;
 
   const expectedComponentInfo: ComponentInfo = {
+    kind: ArtifactKind.COMPONENT,
     className: "SaveCancelButtonComponent",
     selector: "save-cancel-button",
     inputs: [
@@ -237,6 +244,162 @@ suite("parser", () => {
       assert.ok(result);
       // Template literals are StringLiteralLike
       assert.strictEqual(result.selector, "template-literal");
+    });
+  });
+
+  suite("parseDirective", () => {
+    const mockDirectiveData = `
+      @Directive({
+        selector: '[appHighlight]'
+      })
+      export class HighlightDirective {
+        @Input() highlightColor: string;
+        @Input('appHighlight') defaultColor: string;
+        @Output() highlighted = new EventEmitter<boolean>();
+      }
+    `;
+
+    const expectedDirectiveInfo: DirectiveInfo = {
+      kind: ArtifactKind.DIRECTIVE,
+      className: "HighlightDirective",
+      selector: "[appHighlight]",
+      inputs: [
+        { name: "highlightColor", type: "string" },
+        { name: "appHighlight", type: "string" },
+      ],
+      outputs: [{ name: "highlighted", type: "any" }],
+    };
+
+    test("should parse directive and return metadata matching expected structure", () => {
+      const directive = parseDirective(mockDirectiveData);
+      assert.deepStrictEqual(directive, expectedDirectiveInfo);
+    });
+
+    test("should return undefined for empty string", () => {
+      const result = parseDirective("");
+      assert.strictEqual(result, undefined);
+    });
+
+    test("should return undefined for non-directive code", () => {
+      const result = parseDirective("const x = 1;");
+      assert.strictEqual(result, undefined);
+    });
+
+    test("should return undefined for component code", () => {
+      const componentCode = `
+        @Component({ selector: 'my-component' })
+        export class MyComponent {}
+      `;
+      const result = parseDirective(componentCode);
+      assert.strictEqual(result, undefined);
+    });
+
+    test("should parse directive with no inputs or outputs", () => {
+      const simpleDirective = `
+        @Directive({ selector: '[simple]' })
+        export class SimpleDirective {}
+      `;
+      const result = parseDirective(simpleDirective);
+      assert.ok(result);
+      assert.strictEqual(result.kind, "directive");
+      assert.strictEqual(result.className, "SimpleDirective");
+      assert.strictEqual(result.selector, "[simple]");
+      assert.deepStrictEqual(result.inputs, []);
+      assert.deepStrictEqual(result.outputs, []);
+    });
+  });
+
+  suite("parsePipe", () => {
+    const mockPipeData = `
+      @Pipe({
+        name: 'currencyFormat'
+      })
+      export class CurrencyFormatPipe implements PipeTransform {
+        transform(value: number, currency: string): string {
+          return currency + value.toFixed(2);
+        }
+      }
+    `;
+
+    const expectedPipeInfo: PipeInfo = {
+      kind: ArtifactKind.PIPE,
+      className: "CurrencyFormatPipe",
+      name: "currencyFormat",
+    };
+
+    test("should parse pipe and return metadata matching expected structure", () => {
+      const pipe = parsePipe(mockPipeData);
+      assert.deepStrictEqual(pipe, expectedPipeInfo);
+    });
+
+    test("should return undefined for empty string", () => {
+      const result = parsePipe("");
+      assert.strictEqual(result, undefined);
+    });
+
+    test("should return undefined for non-pipe code", () => {
+      const result = parsePipe("const x = 1;");
+      assert.strictEqual(result, undefined);
+    });
+
+    test("should return undefined for component code", () => {
+      const componentCode = `
+        @Component({ selector: 'my-component' })
+        export class MyComponent {}
+      `;
+      const result = parsePipe(componentCode);
+      assert.strictEqual(result, undefined);
+    });
+
+    test("should extract pipe name correctly", () => {
+      const pipe = parsePipe(mockPipeData);
+      assert.strictEqual(pipe?.name, "currencyFormat");
+    });
+  });
+
+  suite("parseAngularFile", () => {
+    test("should detect and parse component", () => {
+      const componentCode = `
+        @Component({ selector: 'my-comp' })
+        export class MyComponent {}
+      `;
+      const result = parseAngularFile(componentCode);
+      assert.ok(result);
+      assert.strictEqual(result.kind, ArtifactKind.COMPONENT);
+    });
+
+    test("should detect and parse directive", () => {
+      const directiveCode = `
+        @Directive({ selector: '[myDir]' })
+        export class MyDirective {}
+      `;
+      const result = parseAngularFile(directiveCode);
+      assert.ok(result);
+      assert.strictEqual(result.kind, ArtifactKind.DIRECTIVE);
+    });
+
+    test("should detect and parse pipe", () => {
+      const pipeCode = `
+        @Pipe({ name: 'myPipe' })
+        export class MyPipe {}
+      `;
+      const result = parseAngularFile(pipeCode);
+      assert.ok(result);
+      assert.strictEqual(result.kind, ArtifactKind.PIPE);
+    });
+
+    test("should return undefined for non-Angular class", () => {
+      const serviceCode = `
+        @Injectable()
+        export class MyService {}
+      `;
+      const result = parseAngularFile(serviceCode);
+      assert.strictEqual(result, undefined);
+    });
+
+    test("should return undefined for empty string", () => {
+      const result = parseAngularFile("");
+      assert.strictEqual(result, undefined);
     });
   });
 });
