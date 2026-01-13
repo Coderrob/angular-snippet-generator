@@ -73,7 +73,7 @@ Configure where snippets are saved via VS Code settings:
 
 | Setting | Options | Description |
 | ------- | ------- | ----------- |
-| `angularSnippetGenerator.snippetLocation` | `workspace` (default) | Save to `.vscode/angular.code-snippets` in your project |
+| `angularCodeSnippetGenerator.snippetLocation` | `workspace` (default) | Save to `.vscode/angular.code-snippets` in your project |
 | | `user` | Save to your global VS Code user snippets folder |
 | | `ask` | Prompt each time to choose the location |
 

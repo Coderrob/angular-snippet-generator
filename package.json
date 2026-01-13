@@ -38,7 +38,7 @@
     "configuration": {
       "title": "Angular Code Snippet Generator",
       "properties": {
-        "angularSnippetGenerator.snippetLocation": {
+        "angularCodeSnippetGenerator.snippetLocation": {
           "type": "string",
           "default": "workspace",
           "enum": [
