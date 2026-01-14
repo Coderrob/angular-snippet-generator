@@ -2,7 +2,7 @@
 
 <p align="center">
   <img
-    src="public/img/angular-code-snippet-generator-logo.png"
+    src="public/img/angular-code-snippet-generator-small-logo.png"
     alt="Angular Code Snippet Generator logo"
   />
 </p>
@@ -59,13 +59,14 @@ Angular projects.
 2. Press `F5` to launch the Extension Development Host.
 3. In the new VS Code window, open an Angular project.
 4. **Right-click on any folder** in the Explorer sidebar.
-5. Select **"Create Angular Code Snippets"** from the context menu.
-6. The extension will:
+5. Navigate to the **"Code Snippets"** submenu at the bottom of the context menu.
+6. Select **"Create Angular Code Snippets"**.
+7. The extension will:
    - Scan the folder recursively for Angular files (`.component.ts`, `.directive.ts`, `.pipe.ts`)
    - Parse each file to extract inputs, outputs, and metadata
    - Generate VS Code snippets with proper tab stops and placeholders
    - Save the snippets based on your configuration (see below)
-7. Start typing the component selector, directive attribute, or pipe name in any HTML file to use the generated snippets.
+8. Start typing the component selector, directive attribute, or pipe name in any HTML file to use the generated snippets.
 
 ### Configuration
 
@@ -192,6 +193,32 @@ src/
 
 If you encounter any issues or have questions, please open an issue on the
 [GitHub repository](https://github.com/Coderrob/angular-code-snippet-generator/issues).
+
+## Troubleshooting
+
+### The "Code Snippets" menu doesn't appear in the context menu
+
+1. **Reload VS Code**: Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac), type "Developer: Reload Window", and select it.
+2. **Check extension is enabled**: Open the Extensions view (`Ctrl+Shift+X`), search for "Angular Code Snippet Generator", and ensure it's enabled.
+3. **Right-click on a folder**: The menu only appears when right-clicking on folders in the Explorer sidebar, not on files or empty space.
+
+### No snippets are generated
+
+- **Verify Angular files exist**: The extension only processes files ending in `.component.ts`, `.directive.ts`, or `.pipe.ts`.
+- **Check for valid decorators**: Files must contain `@Component()`, `@Directive()`, or `@Pipe()` decorators with proper metadata.
+- **Ensure files have selectors/names**: Components and directives need a `selector` property; pipes need a `name` property.
+
+### Snippets aren't appearing in IntelliSense
+
+1. **Reload VS Code** after generating snippets.
+2. **Check snippet location**: If saved to workspace (`.vscode/angular.code-snippets`), ensure the file exists.
+3. **Verify file scope**: Generated snippets are scoped to `html` files. Make sure you're in an HTML file.
+4. **Type the prefix**: Start typing the component selector, directive attribute, or pipe name to trigger the snippet.
+
+### Extension not activating
+
+- **Check VS Code version**: This extension requires VS Code 1.76.0 or higher.
+- **View Output logs**: Open the Output panel (`Ctrl+Shift+U`) and select "Extension Host" from the dropdown to see any activation errors.
 
 ## Contributing
 
