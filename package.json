@@ -17,9 +17,17 @@
     "Snippets",
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onStartupFinished"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
+    "submenus": [
+      {
+        "id": "codeSnippets",
+        "label": "Code Snippets"
+      }
+    ],
     "commands": [
       {
         "command": "angular-code-snippet-generator.createSnippets",
@@ -29,9 +37,15 @@
     "menus": {
       "explorer/context": [
         {
+          "submenu": "codeSnippets",
           "when": "explorerResourceIsFolder",
+          "group": "z_commands"
+        }
+      ],
+      "codeSnippets": [
+        {
           "command": "angular-code-snippet-generator.createSnippets",
-          "group": "navigation"
+          "when": "explorerResourceIsFolder"
         }
       ]
     },
