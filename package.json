@@ -86,12 +86,10 @@
   },
   "icon": "public/img/angular-snippet-generator-icon.png",
   "keywords": [
-    "vscode",
     "angular",
-    "code",
-    "snippets",
-    "angular",
-    "snippets"
+    "code-snippets",
+    "extension",
+    "vscode"
   ],
   "license": "Apache-2.0",
   "main": "./dist/extension.js",
