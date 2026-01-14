@@ -107,7 +107,7 @@
     "coverage": "c8 node ./out/test/runCoverage.js",
     "coverage:check": "c8 check-coverage",
     "ext:build": "npm run compile",
-    "ext:install": "node -e \"const fs=require('fs');const {execSync}=require('child_process');const files=fs.readdirSync('.').filter(f=>f.endsWith('.vsix'));if(!files.length){console.error('No .vsix found. Run: npm run ext:package');process.exit(1);}const latest=files.sort((a,b)=>fs.statSync(b).mtimeMs-fs.statSync(a).mtimeMs)[0];console.log('Installing', latest);execSync('code --install-extension '+latest,{stdio:'inherit'});\"",
+    "ext:install": "node scripts/install-extension.cjs",
     "ext:package": "npx @vscode/vsce package",
     "ext:reinstall": "npm run ext:package && npm run ext:install",
     "format": "prettier --write src",

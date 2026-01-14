@@ -1,11 +1,12 @@
-﻿# Angular Snippet Generator
-
+﻿
 <p align="center">
   <img
     src="public/img/angular-snippet-generator-small-logo.png"
     alt="Angular Snippet Generator logo"
   />
 </p>
+
+# Angular Snippet Generator
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![ESLint](https://img.shields.io/badge/ESLint-9.x-4B32C3.svg)](https://eslint.org/)
