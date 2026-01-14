@@ -9,15 +9,15 @@
   "contributes": {
     "commands": [
       {
-        "command": "angular-code-snippet-generator.createSnippets",
-        "title": "Create Angular Code Snippets"
+        "command": "angular-snippet-generator.createSnippets",
+        "title": "Create Angular Snippets"
       }
     ],
     "configuration": {
       "properties": {
-        "angularCodeSnippetGenerator.snippetLocation": {
+        "angularSnippetGenerator.snippetLocation": {
           "default": "workspace",
-          "description": "Where to save the generated Angular code snippets.",
+          "description": "Where to save the generated Angular snippets.",
           "enum": [
             "workspace",
             "user",
@@ -31,12 +31,12 @@
           "type": "string"
         }
       },
-      "title": "Angular Code Snippet Generator"
+      "title": "Angular Snippet Generator"
     },
     "menus": {
       "codeSnippets": [
         {
-          "command": "angular-code-snippet-generator.createSnippets",
+          "command": "angular-snippet-generator.createSnippets",
           "when": "explorerResourceIsFolder"
         }
       ],
@@ -80,11 +80,11 @@
     "webpack": "^5.75.0",
     "webpack-cli": "^5.0.1"
   },
-  "displayName": "Angular Code Snippet Generator",
+  "displayName": "Angular Snippet Generator",
   "engines": {
     "vscode": "^1.76.0"
   },
-  "icon": "public/img/angular-code-snippet-generator-icon.png",
+  "icon": "public/img/angular-snippet-generator-icon.png",
   "keywords": [
     "vscode",
     "angular",
@@ -95,11 +95,11 @@
   ],
   "license": "Apache-2.0",
   "main": "./dist/extension.js",
-  "name": "angular-code-snippet-generator",
+  "name": "angular-snippet-generator",
   "publisher": "coderrob",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Coderrob/angular-code-snippet-generator.git"
+    "url": "https://github.com/Coderrob/angular-snippet-generator.git"
   },
   "scripts": {
     "compile": "webpack",

@@ -30,7 +30,7 @@ export enum ArtifactKind {
 
 /** Configuration key names for VS Code settings. */
 export enum ConfigKey {
-  SECTION = "angularCodeSnippetGenerator",
+  SECTION = "angularSnippetGenerator",
   SNIPPET_LOCATION = "snippetLocation",
 }
 

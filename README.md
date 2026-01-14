@@ -1,9 +1,9 @@
-﻿# Angular Code Snippet Generator
+﻿# Angular Snippet Generator
 
 <p align="center">
   <img
-    src="public/img/angular-code-snippet-generator-small-logo.png"
-    alt="Angular Code Snippet Generator logo"
+    src="public/img/angular-snippet-generator-small-logo.png"
+    alt="Angular Snippet Generator logo"
   />
 </p>
 
@@ -14,7 +14,7 @@
 
 ## Overview
 
-Angular Code Snippet Generator is a Visual Studio Code extension designed to streamline
+Angular Snippet Generator is a Visual Studio Code extension designed to streamline
 Angular development by automatically generating code snippets from component, directive, and pipe source files.
 It simplifies repetitive tasks, improves productivity, and ensures consistency in your
 Angular projects.
@@ -38,13 +38,13 @@ Angular projects.
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/Coderrob/angular-code-snippet-generator.git
+   git clone https://github.com/Coderrob/angular-snippet-generator.git
    ```
 
 2. Navigate to the project directory:
 
    ```bash
-   cd angular-code-snippet-generator
+   cd angular-snippet-generator
    ```
 
 3. Install dependencies:
@@ -60,7 +60,7 @@ Angular projects.
 3. In the new VS Code window, open an Angular project.
 4. **Right-click on any folder** in the Explorer sidebar.
 5. Navigate to the **"Code Snippets"** submenu at the bottom of the context menu.
-6. Select **"Create Angular Code Snippets"**.
+6. Select **"Create Angular Snippets"**.
 7. The extension will:
    - Scan the folder recursively for Angular files (`.component.ts`, `.directive.ts`, `.pipe.ts`)
    - Parse each file to extract inputs, outputs, and metadata
@@ -74,7 +74,7 @@ Configure where snippets are saved via VS Code settings:
 
 | Setting | Options | Description |
 | ------- | ------- | ----------- |
-| `angularCodeSnippetGenerator.snippetLocation` | `workspace` (default) | Save to `.vscode/angular.code-snippets` in your project |
+| `angularSnippetGenerator.snippetLocation` | `workspace` (default) | Save to `.vscode/angular.code-snippets` in your project |
 | | `user` | Save to your global VS Code user snippets folder |
 | | `ask` | Prompt each time to choose the location |
 
@@ -192,14 +192,14 @@ src/
 ## Support
 
 If you encounter any issues or have questions, please open an issue on the
-[GitHub repository](https://github.com/Coderrob/angular-code-snippet-generator/issues).
+[GitHub repository](https://github.com/Coderrob/angular-snippet-generator/issues).
 
 ## Troubleshooting
 
 ### The "Code Snippets" menu doesn't appear in the context menu
 
 1. **Reload VS Code**: Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac), type "Developer: Reload Window", and select it.
-2. **Check extension is enabled**: Open the Extensions view (`Ctrl+Shift+X`), search for "Angular Code Snippet Generator", and ensure it's enabled.
+2. **Check extension is enabled**: Open the Extensions view (`Ctrl+Shift+X`), search for "Angular Snippet Generator", and ensure it's enabled.
 3. **Right-click on a folder**: The menu only appears when right-clicking on folders in the Explorer sidebar, not on files or empty space.
 
 ### No snippets are generated
