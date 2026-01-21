@@ -42,13 +42,13 @@ Angular projects.
    git clone https://github.com/Coderrob/angular-snippet-generator.git
    ```
 
-2. Navigate to the project directory:
+1. Navigate to the project directory:
 
    ```bash
    cd angular-snippet-generator
    ```
 
-3. Install dependencies:
+1. Install dependencies:
 
    ```bash
    npm install
@@ -57,17 +57,17 @@ Angular projects.
 ### Usage
 
 1. Open the project in VS Code.
-2. Press `F5` to launch the Extension Development Host.
-3. In the new VS Code window, open an Angular project.
-4. **Right-click on any folder** in the Explorer sidebar.
-5. Navigate to the **"Code Snippets"** submenu at the bottom of the context menu.
-6. Select **"Create Angular Snippets"**.
-7. The extension will:
+1. Press `F5` to launch the Extension Development Host.
+1. In the new VS Code window, open an Angular project.
+1. **Right-click on any folder** in the Explorer sidebar.
+1. Navigate to the **"Code Snippets"** submenu at the bottom of the context menu.
+1. Select **"Create Angular Snippets"**.
+1. The extension will:
    - Scan the folder recursively for Angular files (`.component.ts`, `.directive.ts`, `.pipe.ts`)
    - Parse each file to extract inputs, outputs, and metadata
    - Generate VS Code snippets with proper tab stops and placeholders
    - Save the snippets based on your configuration (see below)
-8. Start typing the component selector, directive attribute, or pipe name in any HTML file to use the generated snippets.
+1. Start typing the component selector, directive attribute, or pipe name in any HTML file to use the generated snippets.
 
 ### Configuration
 
@@ -200,8 +200,8 @@ If you encounter any issues or have questions, please open an issue on the
 ### The "Code Snippets" menu doesn't appear in the context menu
 
 1. **Reload VS Code**: Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac), type "Developer: Reload Window", and select it.
-2. **Check extension is enabled**: Open the Extensions view (`Ctrl+Shift+X`), search for "Angular Snippet Generator", and ensure it's enabled.
-3. **Right-click on a folder**: The menu only appears when right-clicking on folders in the Explorer sidebar, not on files or empty space.
+1. **Check extension is enabled**: Open the Extensions view (`Ctrl+Shift+X`), search for "Angular Snippet Generator", and ensure it's enabled.
+1. **Right-click on a folder**: The menu only appears when right-clicking on folders in the Explorer sidebar, not on files or empty space.
 
 ### No snippets are generated
 
@@ -212,9 +212,9 @@ If you encounter any issues or have questions, please open an issue on the
 ### Snippets aren't appearing in IntelliSense
 
 1. **Reload VS Code** after generating snippets.
-2. **Check snippet location**: If saved to workspace (`.vscode/angular.code-snippets`), ensure the file exists.
-3. **Verify file scope**: Generated snippets are scoped to `html` files. Make sure you're in an HTML file.
-4. **Type the prefix**: Start typing the component selector, directive attribute, or pipe name to trigger the snippet.
+1. **Check snippet location**: If saved to workspace (`.vscode/angular.code-snippets`), ensure the file exists.
+1. **Verify file scope**: Generated snippets are scoped to `html` files. Make sure you're in an HTML file.
+1. **Type the prefix**: Start typing the component selector, directive attribute, or pipe name to trigger the snippet.
 
 ### Extension not activating
 
@@ -224,12 +224,12 @@ If you encounter any issues or have questions, please open an issue on the
 ## Contributing
 
 1. Fork the repository.
-2. Create a feature branch (`git checkout -b feature/amazing-feature`).
-3. Ensure tests pass (`npm test`).
-4. Ensure linting passes (`npm run lint`).
-5. Commit changes (`git commit -m 'Add amazing feature'`).
-6. Push to branch (`git push origin feature/amazing-feature`).
-7. Open a Pull Request.
+1. Create a feature branch (`git checkout -b feature/amazing-feature`).
+1. Ensure tests pass (`npm test`).
+1. Ensure linting passes (`npm run lint`).
+1. Commit changes (`git commit -m 'Add amazing feature'`).
+1. Push to branch (`git push origin feature/amazing-feature`).
+1. Open a Pull Request.
 
 ## License
 

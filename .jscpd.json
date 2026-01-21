@@ -1,7 +1,6 @@
 {
   "minLines": 10,
   "minTokens": 70,
-  "ignore": [
-    "**/src/test/**"
-  ]
+  "threshold": 2,
+  "ignore": ["**/src/test/**"]
 }

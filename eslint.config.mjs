@@ -14,13 +14,7 @@ export default tseslint.config(
   ...tseslint.configs.recommended,
   jsdocPlugin.configs["flat/recommended-typescript"],
   {
-    ignores: [
-      "out/**",
-      "dist/**",
-      "**/*.d.ts",
-      "webpack.config.js",
-      "eslint.config.mjs",
-    ],
+    ignores: ["dist/**", "**/*.d.ts", "webpack.config.js", "eslint.config.mjs"],
   },
   {
     files: ["src/**/*.ts"],
