@@ -113,7 +113,7 @@
     "format:check": "prettier --check src",
     "lint": "npm run lint:eslint && npm run lint:cpd && npm run lint:deps",
     "lint:cpd": "jscpd src",
-    "lint:deps": "depcruise src --config .dependency-cruiser.js",
+    "lint:deps": "depcruise src --config .dependency-cruiser.cjs",
     "lint:eslint": "eslint src",
     "lint:fix": "eslint src --fix",
     "lint:md": "markdownlint README.md --fix",
