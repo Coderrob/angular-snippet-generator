@@ -72,6 +72,7 @@
     "eslint-plugin-prettier": "^5.5.4",
     "glob": "^10.0.0",
     "jscpd": "^4.0.5",
+    "make-coverage-badge": "^1.2.0",
     "mocha": "^10.2.0",
     "prettier": "^3.7.4",
     "source-map-support": "^0.5.21",
@@ -104,6 +105,7 @@
     "compile": "webpack",
     "compile-tests": "tsc -p . --outDir dist",
     "coverage": "c8 node ./dist/test/runCoverage.js",
+    "coverage:badge": "make-coverage-badge --output-path ./coverage-badge.json",
     "coverage:check": "c8 check-coverage",
     "ext:build": "npm run compile",
     "ext:install": "node scripts/install-extension.cjs",
@@ -123,9 +125,7 @@
     "test": "node ./dist/test/runTest.js",
     "test:unit": "node ./dist/test/runCoverage.js",
     "typecheck": "tsc --noEmit",
-    "vscode:prepublish": "npm run package",
-    "watch": "webpack --watch",
-    "watch-tests": "tsc -p . -w --outDir dist"
+    "validate-package": "node -e \"JSON.parse(require('fs').readFileSync('package.json', 'utf8')); console.log('package.json is valid JSON')\""
   },
   "version": "0.0.1"
 }

@@ -8,10 +8,13 @@
 
 # Angular Snippet Generator
 
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
-[![ESLint](https://img.shields.io/badge/ESLint-9.x-4B32C3.svg)](https://eslint.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6.svg)](https://www.typescriptlang.org/)
 [![Code Style: Prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg)](https://prettier.io/)
+[![Coverage](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/Coderrob/angular-snippet-generator/main/coverage-badge.json)](https://github.com/Coderrob/angular-snippet-generator)
+[![ESLint](https://img.shields.io/badge/ESLint-9.x-4B32C3.svg)](https://eslint.org/)
+[![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6.svg)](https://www.typescriptlang.org/)
+[![Visual Studio Marketplace Installs](https://img.shields.io/visual-studio-marketplace/i/coderrob.angular-snippet-generator)](https://marketplace.visualstudio.com/items?itemName=coderrob.angular-snippet-generator)
+[![Visual Studio Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/coderrob.angular-snippet-generator)](https://marketplace.visualstudio.com/items?itemName=coderrob.angular-snippet-generator)
 
 ## Overview
 

@@ -33,6 +33,18 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Check test coverage
+        run: npm run coverage:check
+
+      - name: Generate coverage badge
+        run: npm run coverage:badge
+
+      - name: Validate package.json
+        run: npm run validate-package
+
+      - name: Lint markdown files
+        run: npx markdownlint "**/*.md" --ignore node_modules
+
   release:
     needs: test
     runs-on: ubuntu-latest

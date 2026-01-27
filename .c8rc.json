@@ -7,6 +7,6 @@
   "include": ["dist/**/*.js"],
   "lines": 95,
   "report-dir": "coverage",
-  "reporter": ["text", "html", "lcov"],
+  "reporter": ["text", "html", "lcov", "json"],
   "statements": 95
 }
