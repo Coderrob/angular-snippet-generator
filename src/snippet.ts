@@ -29,6 +29,16 @@ import {
 /** Indentation for snippet body attributes. */
 const INDENT = "  ";
 
+/** Computed snippet parts: formatted lines and final tab stop index. */
+interface ISnippetParts {
+  /** Formatted input attribute lines. */
+  readonly inputLines: string[];
+  /** Formatted output binding lines. */
+  readonly outputLines: string[];
+  /** The final tab stop index. */
+  readonly finalIndex: number;
+}
+
 /** Prefix for generated event handler function names. */
 const FUNCTION_PREFIX = "on";
 
@@ -138,21 +148,29 @@ export const createComponentSnippet = (
 export const createDirectiveSnippet = (
   directive: IDirectiveInfo
 ): ISnippet | undefined => {
-  if (!directive.selector) {
-    return undefined;
-  }
+  if (!directive.selector) return undefined;
   const { className, selector, inputs, outputs } = directive;
   const cleanSelector = cleanDirectiveSelector(selector);
-  const title = `${formatComponentName(className)} Directive`;
   const parts = computeSnippetParts(inputs, outputs);
+  return buildDirectiveSnippetResult(className, cleanSelector, parts);
+};
+
+/**
+ * Builds the final directive snippet result object.
+ * @param className - The class name.
+ * @param cleanSelector - The cleaned selector string.
+ * @param parts - The computed snippet parts.
+ * @returns The snippet result object.
+ */
+const buildDirectiveSnippetResult = (
+  className: string,
+  cleanSelector: string,
+  parts: ReturnType<typeof computeSnippetParts>
+): ISnippet => {
+  const title = `${formatComponentName(className)} Directive`;
   return {
     [title]: {
-      body: buildDirectiveBody(
-        cleanSelector,
-        parts.inputLines,
-        parts.outputLines,
-        parts.finalIndex
-      ),
+      body: buildDirectiveBody(cleanSelector, parts.inputLines, parts.outputLines, parts.finalIndex),
       description: `A directive snippet for ${formatComponentName(className)}.`,
       prefix: [cleanSelector],
       scope: "html",
