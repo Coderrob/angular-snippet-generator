@@ -21,27 +21,35 @@ import path from "node:path";
 import { runTests } from "@vscode/test-electron";
 
 /**
+ * Creates the test configuration for VS Code extension tests.
+ * @returns The test configuration object.
+ */
+const createTestConfig = () => {
+  delete process.env.ELECTRON_RUN_AS_NODE;
+  const extensionDevelopmentPath = path.resolve(__dirname, "../../");
+  const extensionTestsPath = path.resolve(__dirname, "./suite/index");
+  const userDataDir = fs.mkdtempSync(
+    path.join(os.tmpdir(), "vscode-test-user-data-")
+  );
+  const extensionsDir = fs.mkdtempSync(
+    path.join(os.tmpdir(), "vscode-test-extensions-")
+  );
+  return {
+    extensionDevelopmentPath,
+    extensionTestsPath,
+    launchArgs: [
+      `--user-data-dir=${userDataDir}`,
+      `--extensions-dir=${extensionsDir}`,
+    ],
+  };
+};
+
+/**
  * Main entry point for running VS Code extension tests.
  */
 async function main() {
   try {
-    delete process.env.ELECTRON_RUN_AS_NODE;
-    const extensionDevelopmentPath = path.resolve(__dirname, "../../");
-    const extensionTestsPath = path.resolve(__dirname, "./suite/index");
-    const userDataDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), "vscode-test-user-data-")
-    );
-    const extensionsDir = fs.mkdtempSync(
-      path.join(os.tmpdir(), "vscode-test-extensions-")
-    );
-    await runTests({
-      extensionDevelopmentPath,
-      extensionTestsPath,
-      launchArgs: [
-        `--user-data-dir=${userDataDir}`,
-        `--extensions-dir=${extensionsDir}`,
-      ],
-    });
+    await runTests(createTestConfig());
   } catch (err) {
     console.error("Failed to run tests", err);
     process.exit(1);

@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright (c) 2026 Robert Lindley
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,15 +15,6 @@
  */
 
 /**
- * Capitalizes the first character of a string while preserving the rest.
- * Does not scan for the first non-whitespace character.
- * @param value - The string to transform.
- * @returns The string with its first character capitalized, or the original value if empty/falsy.
- */
-export const upperCaseFirstCharacter = (value = ""): string =>
-  value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
-
-/**
  * Converts a kebab-cased string to title case.
  * Replaces hyphens with spaces and capitalizes the first letter of each word.
  * @param value - The kebab-cased string to convert.
@@ -36,3 +27,12 @@ export const kebabToTitleCase = (value = ""): string =>
     .filter(Boolean)
     .map(upperCaseFirstCharacter)
     .join(" ");
+
+/**
+ * Capitalizes the first character of a string while preserving the rest.
+ * Does not scan for the first non-whitespace character.
+ * @param value - The string to transform.
+ * @returns The string with its first character capitalized, or the original value if empty/falsy.
+ */
+export const upperCaseFirstCharacter = (value = ""): string =>
+  value ? value.charAt(0).toUpperCase() + value.slice(1) : value;
