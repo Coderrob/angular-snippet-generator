@@ -1,4 +1,4 @@
-﻿/**
+/**
  * Copyright (c) 2026 Robert Lindley
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,7 @@ import { ArtifactKind } from "./constants";
 /**
  * Represents an Angular component's metadata extracted from source code.
  */
-export interface ComponentInfo {
+export interface IComponentInfo {
   /** The type of Angular artifact. */
   readonly kind: typeof ArtifactKind.COMPONENT;
   /** The class name of the component. */
@@ -27,15 +27,15 @@ export interface ComponentInfo {
   /** The component's selector attribute value. */
   readonly selector: string;
   /** The component's @Input decorated properties. */
-  readonly inputs: readonly Property[];
+  readonly inputs: readonly IProperty[];
   /** The component's @Output decorated properties. */
-  readonly outputs: readonly Property[];
+  readonly outputs: readonly IProperty[];
 }
 
 /**
  * Represents an Angular directive's metadata extracted from source code.
  */
-export interface DirectiveInfo {
+export interface IDirectiveInfo {
   /** The type of Angular artifact. */
   readonly kind: typeof ArtifactKind.DIRECTIVE;
   /** The class name of the directive. */
@@ -43,15 +43,15 @@ export interface DirectiveInfo {
   /** The directive's selector attribute value (typically an attribute selector). */
   readonly selector: string;
   /** The directive's @Input decorated properties. */
-  readonly inputs: readonly Property[];
+  readonly inputs: readonly IProperty[];
   /** The directive's @Output decorated properties. */
-  readonly outputs: readonly Property[];
+  readonly outputs: readonly IProperty[];
 }
 
 /**
  * Represents an Angular pipe's metadata extracted from source code.
  */
-export interface PipeInfo {
+export interface IPipeInfo {
   /** The type of Angular artifact. */
   readonly kind: typeof ArtifactKind.PIPE;
   /** The class name of the pipe. */
@@ -63,12 +63,12 @@ export interface PipeInfo {
 /**
  * Union type for all Angular artifact metadata.
  */
-export type AngularInfo = ComponentInfo | DirectiveInfo | PipeInfo;
+export type AngularInfo = IComponentInfo | IDirectiveInfo | IPipeInfo;
 
 /**
  * Represents an Angular component property with its name and type.
  */
-export interface Property {
+export interface IProperty {
   /** The property name or alias. */
   readonly name: string;
   /** The property's TypeScript type. */
@@ -78,7 +78,7 @@ export interface Property {
 /**
  * Represents a VS Code snippet structure.
  */
-export interface Snippet {
+export interface ISnippet {
   readonly [key: string]: {
     readonly body: readonly string[];
     readonly description: string;

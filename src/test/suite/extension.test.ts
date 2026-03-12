@@ -1,4 +1,3 @@
-﻿/* eslint-disable @typescript-eslint/naming-convention */
 /**
  * Copyright (c) 2026 Robert Lindley
  *
@@ -19,39 +18,47 @@ import * as assert from "node:assert";
 
 import { mergeSnippet } from "../../extension";
 
-suite("extension", () => {
-  suite("mergeSnippet", () => {
-    test("should merge snippet into accumulated object", () => {
-      const accumulated = { existing: { body: ["test"] } };
-      const snippet = {
-        "New Snippet": {
-          body: ["new"],
-          description: "test",
-          prefix: ["prefix"],
-          scope: "html",
-        },
-      };
-      const result = mergeSnippet(accumulated, snippet);
-      assert.deepStrictEqual(result, { ...accumulated, ...snippet });
-    });
+const SNIPPET_KEY = "New Snippet";
+const SNIPPET_FIXTURE = {
+  [SNIPPET_KEY]: {
+    body: ["new"],
+    description: "test",
+    prefix: ["prefix"],
+    scope: "html",
+  },
+};
 
-    test("should return accumulated when snippet is undefined", () => {
-      const accumulated = { existing: { body: ["test"] } };
-      const result = mergeSnippet(accumulated, undefined);
-      assert.deepStrictEqual(result, accumulated);
-    });
+const ACCUMULATED_FIXTURE = { existing: { body: ["test"] } };
 
-    test("should handle empty accumulated object", () => {
-      const snippet = {
-        "New Snippet": {
-          body: ["new"],
-          description: "test",
-          prefix: ["prefix"],
-          scope: "html",
-        },
-      };
-      const result = mergeSnippet({}, snippet);
-      assert.deepStrictEqual(result, snippet);
+/**
+ * Defines tests for the mergeSnippet function.
+ */
+const registerMergeSnippetCore = (): void => {
+  test("should merge snippet into accumulated object", () => {
+    const result = mergeSnippet(ACCUMULATED_FIXTURE, SNIPPET_FIXTURE);
+    assert.deepStrictEqual(result, {
+      ...ACCUMULATED_FIXTURE,
+      ...SNIPPET_FIXTURE,
     });
   });
+  test("should return accumulated when snippet is undefined", () => {
+    assert.deepStrictEqual(
+      mergeSnippet(ACCUMULATED_FIXTURE, undefined),
+      ACCUMULATED_FIXTURE
+    );
+  });
+  test("should handle empty accumulated object", () => {
+    assert.deepStrictEqual(mergeSnippet({}, SNIPPET_FIXTURE), SNIPPET_FIXTURE);
+  });
+};
+
+/**
+ * Registers tests for the mergeSnippet function.
+ */
+const registerMergeSnippetTests = (): void => {
+  suite("mergeSnippet", registerMergeSnippetCore);
+};
+
+suite("extension", () => {
+  registerMergeSnippetTests();
 });

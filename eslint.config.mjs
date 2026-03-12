@@ -8,11 +8,13 @@ import jsdocPlugin from "eslint-plugin-jsdoc";
 import importPlugin from "eslint-plugin-import";
 import prettierConfig from "eslint-config-prettier";
 import prettierPlugin from "eslint-plugin-prettier";
+import zeroTolerance from "@coderrob/eslint-plugin-zero-tolerance";
 
 export default tseslint.config(
   eslint.configs.recommended,
   ...tseslint.configs.recommended,
   jsdocPlugin.configs["flat/recommended-typescript"],
+  zeroTolerance.configs.recommended,
   {
     ignores: [
       "out/**",
