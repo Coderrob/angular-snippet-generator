@@ -57,6 +57,7 @@
   },
   "description": "A Visual Studio Code extension to generate Angular code snippets.",
   "devDependencies": {
+    "@coderrob/eslint-plugin-zero-tolerance": "^1.1.4",
     "@eslint/js": "^9.0.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "20.x",
